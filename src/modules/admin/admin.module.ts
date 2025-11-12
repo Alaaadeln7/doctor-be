@@ -2,15 +2,15 @@ import { Module } from "@nestjs/common";
 import { AdminController } from "./admin.controller";
 import { AdminService } from "./admin.service";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { AdminEntity } from "src/shared/entities/admins.entity";
-import { BcryptUtilService } from "src/common/utils/bcrypt.util";
+import { AdminEntity } from "../..//shared/entities/admins.entity";
+import { BcryptUtilService } from "../..//common/utils/bcrypt.util";
 import { CheckAdminExistPipe } from "../../common/pipes/check.pipes";
-import { JwtUtilService } from "src/common/utils/jwt.utils";
+import { JwtUtilService } from "../..//common/utils/jwt.utils";
 import { ThrottlerModule } from "@nestjs/throttler";
 import { APP_GUARD } from "@nestjs/core";
-import { CustomThrottlerGuard } from "src/common/guards/throttle.quard";
-import { MailUtilService } from "src/common/utils/mail.util";
-import { OtpUtilService } from "src/common/utils/otp.util";
+import { CustomThrottlerGuard } from "../..//common/guards/throttle.quard";
+import { MailUtilService } from "../..//common/utils/mail.util";
+import { OtpUtilService } from "../..//common/utils/otp.util";
 
 @Module({
   imports: [

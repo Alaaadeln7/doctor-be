@@ -1,16 +1,16 @@
 import { Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { AdminEntity } from "src/shared/entities/admins.entity";
-import { AppointmentEntity } from "src/shared/entities/appointments.entity";
-import { CategoryEntity } from "src/shared/entities/categoris.entity";
-import { CredentialEntity } from "src/shared/entities/credentials.entity";
-import { DoctorEntity } from "src/shared/entities/doctors.entity";
-import { PlanEntity } from "src/shared/entities/plans.entity";
-import { RateEntity } from "src/shared/entities/rates.entity";
-import { RequestEntity } from "src/shared/entities/requests.entity";
-import { ReservationEntity } from "src/shared/entities/reservations.entity";
-import { WorkingHoursEntity } from "src/shared/entities/workinHours.entity";
+import { AdminEntity } from "../shared/entities/admins.entity";
+import { AppointmentEntity } from "../shared/entities/appointments.entity";
+import { CategoryEntity } from "../shared/entities/categoris.entity";
+import { CredentialEntity } from "../shared/entities/credentials.entity";
+import { DoctorEntity } from "../shared/entities/doctors.entity";
+import { PlanEntity } from "../shared/entities/plans.entity";
+import { RateEntity } from "../shared/entities/rates.entity";
+import { RequestEntity } from "../shared/entities/requests.entity";
+import { ReservationEntity } from "../shared/entities/reservations.entity";
+import { WorkingHoursEntity } from "../shared/entities/workinHours.entity";
 
 @Module({
   imports: [

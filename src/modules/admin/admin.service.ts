@@ -6,10 +6,10 @@ import {
 import { ConfigService } from "@nestjs/config";
 import { InjectRepository } from "@nestjs/typeorm";
 import { paginate, Pagination } from "nestjs-typeorm-paginate";
-import { BcryptUtilService } from "src/common/utils/bcrypt.util";
-import { JwtUtilService } from "src/common/utils/jwt.utils";
-import { MailUtilService } from "src/common/utils/mail.util";
-import { OtpUtilService } from "src/common/utils/otp.util";
+import { BcryptUtilService } from "../..//common/utils/bcrypt.util";
+import { JwtUtilService } from "../..//common/utils/jwt.utils";
+import { MailUtilService } from "../..//common/utils/mail.util";
+import { OtpUtilService } from "../..//common/utils/otp.util";
 import {
   BlockAdminDtoResponse,
   CreateAdminDto,
@@ -26,8 +26,8 @@ import {
   updatePagesResponseDto,
   VerifyAdminDtoResponse,
   VerifyAdminSignupDto,
-} from "src/shared/dtos/admin.dto";
-import { AdminEntity } from "src/shared/entities/admins.entity";
+} from "../..//shared/dtos/admin.dto";
+import { AdminEntity } from "../..//shared/entities/admins.entity";
 import { Repository } from "typeorm";
 
 @Injectable()

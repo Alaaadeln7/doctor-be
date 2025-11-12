@@ -27,12 +27,12 @@ import {
   updatePagesResponseDto,
   VerifyAdminDtoResponse,
   VerifyAdminSignupDto,
-} from "src/shared/dtos/admin.dto";
+} from "../..//shared/dtos/admin.dto";
 import { AdminService } from "./admin.service";
 import { Throttle } from "@nestjs/throttler";
-import { Public } from "src/common/decorators/public.decorator";
+import { Public } from "../..//common/decorators/public.decorator";
 import { ApiBearerAuth, ApiExcludeEndpoint, ApiParam } from "@nestjs/swagger";
-import { JwtUtilService } from "src/common/utils/jwt.utils";
+import { JwtUtilService } from "../..//common/utils/jwt.utils";
 
 @Controller("admin")
 export class AdminController {

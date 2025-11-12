@@ -4,8 +4,8 @@ import {
   NotFoundException,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { StorageUtilService } from "src/common/utils/storage.util";
-import { DoctorEntity } from "src/shared/entities/doctors.entity";
+import { StorageUtilService } from "../..//common/utils/storage.util";
+import { DoctorEntity } from "../..//shared/entities/doctors.entity";
 import { Repository } from "typeorm";
 import { FilesType } from "./file.controller";
 

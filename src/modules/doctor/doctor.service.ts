@@ -16,23 +16,23 @@ import {
   GetDoctorQueriesDto,
   LoginDoctorDto,
   updatePasswordDto,
-} from "src/shared/dtos/doctor.dto";
-import { DoctorEntity, FileClass } from "src/shared/entities/doctors.entity";
+} from "../..//shared/dtos/doctor.dto";
+import { DoctorEntity, FileClass } from "../..//shared/entities/doctors.entity";
 import { Not, Repository } from "typeorm";
 import { CredentialService } from "../credential/credential.service";
 import { InjectRepository } from "@nestjs/typeorm";
 import { PlanService } from "../plan/plan.service";
-import { CodeUtilService } from "src/common/utils/code.util";
-import { MailUtilService } from "src/common/utils/mail.util";
-import { OtpUtilService } from "src/common/utils/otp.util";
-import { DoctorResponseType } from "src/shared/type/doctor.type";
-import { JwtUtilService } from "src/common/utils/jwt.utils";
+import { CodeUtilService } from "../..//common/utils/code.util";
+import { MailUtilService } from "../..//common/utils/mail.util";
+import { OtpUtilService } from "../..//common/utils/otp.util";
+import { DoctorResponseType } from "../..//shared/type/doctor.type";
+import { JwtUtilService } from "../..//common/utils/jwt.utils";
 import { ConfigService } from "@nestjs/config";
 import { Response } from "express";
-import DoctorVerifyUpdateEmail from "src/common/pages/doctor.verifyUpdateEmail";
-import { BcryptUtilService } from "src/common/utils/bcrypt.util";
+import DoctorVerifyUpdateEmail from "../..//common/pages/doctor.verifyUpdateEmail";
+import { BcryptUtilService } from "../..//common/utils/bcrypt.util";
 import { CategoryService } from "../category/category.service";
-import { WorkingHoursEntity } from "src/shared/entities/workinHours.entity";
+import { WorkingHoursEntity } from "../..//shared/entities/workinHours.entity";
 import { paginate } from "nestjs-typeorm-paginate";
 
 @Injectable()
