@@ -9,6 +9,7 @@
     "node": ">=18.0.0"
   },
   "scripts": {
+    "build": "tsc -p tsconfig.build.json",
     "build:prod": "tsc -p tsconfig.build.json && cp -r src/common/templates dist/common/ && cp -r src/shared/data dist/shared/data",
     "copy:assets": "cp -r src/common/templates dist/common/ && cp -r src/shared/data dist/shared/data",
     "copy:templates": "cp -r src/common/templates dist/common/",

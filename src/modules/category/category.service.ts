@@ -1,21 +1,31 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { paginate, Pagination } from 'nestjs-typeorm-paginate';
-import { addCategoryDto, updateCategoryDto } from 'src/shared/dtos/category.dto';
-import { CategoryEntity } from 'src/shared/entities/categoris.entity';
-import { DoctorEntity } from 'src/shared/entities/doctors.entity';
-import { Repository } from 'typeorm';
+import { Injectable, NotFoundException } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { paginate, Pagination } from "nestjs-typeorm-paginate";
+import {
+  addCategoryDto,
+  updateCategoryDto,
+} from "../..//shared/dtos/category.dto";
+import { CategoryEntity } from "../..//shared/entities/categoris.entity";
+import { DoctorEntity } from "../..//shared/entities/doctors.entity";
+import { Repository } from "typeorm";
 
 @Injectable()
 export class CategoryService {
   constructor(
     @InjectRepository(CategoryEntity)
-    private readonly categoryRepo: Repository<CategoryEntity>,
-  ) { }
+    private readonly categoryRepo: Repository<CategoryEntity>
+  ) {}
 
-  async addCategory(data: addCategoryDto, lsUpBy: number): Promise<CategoryEntity> {
+  async addCategory(
+    data: addCategoryDto,
+    lsUpBy: number
+  ): Promise<CategoryEntity> {
     const { title, description } = data;
-    const newCategory = this.categoryRepo.create({ title, description, lsUpBy });
+    const newCategory = this.categoryRepo.create({
+      title,
+      description,
+      lsUpBy,
+    });
     return this.categoryRepo.save(newCategory);
   }
 
@@ -26,13 +36,13 @@ export class CategoryService {
   ): Promise<CategoryEntity> {
     const category = await this.categoryRepo.findOneBy({ id });
     if (!category) {
-      throw new NotFoundException('Category not found');
+      throw new NotFoundException("Category not found");
     }
     const { title, description } = data;
     const updated = this.categoryRepo.merge(category, {
       title,
       description,
-      lsUpBy
+      lsUpBy,
     });
     return this.categoryRepo.save(updated);
   }
@@ -40,7 +50,7 @@ export class CategoryService {
   async deleteCategory(id: number): Promise<CategoryEntity> {
     const category = await this.categoryRepo.findOneBy({ id });
     if (!category) {
-      throw new NotFoundException('Category not found');
+      throw new NotFoundException("Category not found");
     }
     return this.categoryRepo.remove(category);
   }
@@ -52,18 +62,23 @@ export class CategoryService {
   async getAllCategories(
     page: number,
     limit: number,
-    localeCode?: string,
+    localeCode?: string
   ): Promise<Pagination<any>> {
     if (!localeCode) {
-      const queryBuilder = this.categoryRepo.createQueryBuilder('category')
-        .orderBy('category.id', 'ASC')
-        .select(['category.id', 'category.title', 'category.description']);
-      return paginate<CategoryEntity>(queryBuilder, { page, limit, route: 'category' });
+      const queryBuilder = this.categoryRepo
+        .createQueryBuilder("category")
+        .orderBy("category.id", "ASC")
+        .select(["category.id", "category.title", "category.description"]);
+      return paginate<CategoryEntity>(queryBuilder, {
+        page,
+        limit,
+        route: "category",
+      });
     } else {
       const queryBuilder = this.categoryRepo
-        .createQueryBuilder('category')
+        .createQueryBuilder("category")
         .select([
-          'category.id AS id',
+          "category.id AS id",
           `category.title ->> :localeCode AS title`,
           `category.description ->> :localeCode AS description`,
         ])
@@ -77,7 +92,7 @@ export class CategoryService {
         this.categoryRepo.count(),
       ]);
 
-      const items = rawData.map(category => ({
+      const items = rawData.map((category) => ({
         id: category.id,
         title: category.title,
         description: category.description,
@@ -100,27 +115,27 @@ export class CategoryService {
     if (!localeCode) {
       const category = await this.categoryRepo.findOne({ where: { id } });
       if (!category) {
-        throw new NotFoundException('Category not found');
+        throw new NotFoundException("Category not found");
       }
       return {
         id: category.id,
         title: category.title,
-        description: category.description
+        description: category.description,
       };
     } else {
       const category = await this.categoryRepo
-        .createQueryBuilder('category')
+        .createQueryBuilder("category")
         .select([
-          'category.id AS id',
+          "category.id AS id",
           `category.title ->> :localeCode AS title`,
           `category.description ->> :localeCode AS description`,
         ])
-        .where('category.id = :id', { id })
+        .where("category.id = :id", { id })
         .setParameters({ localeCode })
         .getRawOne();
 
       if (!category) {
-        throw new NotFoundException('Category not found');
+        throw new NotFoundException("Category not found");
       }
 
       return {
