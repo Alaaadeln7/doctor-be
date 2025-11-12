@@ -10,7 +10,7 @@ import {
   Res,
   UsePipes,
 } from "@nestjs/common";
-import { CheckAdminExistPipe } from "src/common/pipes/check.pipes";
+import { CheckAdminExistPipe } from "../../common/pipes/check.pipes";
 import {
   BlockAdminDtoResponse,
   CreateAdminDto,
@@ -31,13 +31,7 @@ import {
 import { AdminService } from "./admin.service";
 import { Throttle } from "@nestjs/throttler";
 import { Public } from "src/common/decorators/public.decorator";
-import {
-  ApiBearerAuth,
-  ApiExcludeEndpoint,
-  ApiParam,
-  ApiQuery,
-  getSchemaPath,
-} from "@nestjs/swagger";
+import { ApiBearerAuth, ApiExcludeEndpoint, ApiParam } from "@nestjs/swagger";
 import { JwtUtilService } from "src/common/utils/jwt.utils";
 
 @Controller("admin")

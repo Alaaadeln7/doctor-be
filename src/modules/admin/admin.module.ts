@@ -4,7 +4,7 @@ import { AdminService } from "./admin.service";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { AdminEntity } from "src/shared/entities/admins.entity";
 import { BcryptUtilService } from "src/common/utils/bcrypt.util";
-import { CheckAdminExistPipe } from "src/common/pipes/check.pipes";
+import { CheckAdminExistPipe } from "../../common/pipes/check.pipes";
 import { JwtUtilService } from "src/common/utils/jwt.utils";
 import { ThrottlerModule } from "@nestjs/throttler";
 import { APP_GUARD } from "@nestjs/core";
