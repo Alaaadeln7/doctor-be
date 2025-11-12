@@ -1,0 +1,106 @@
+import { MailerService } from "@nestjs-modules/mailer";
+import { Injectable } from "@nestjs/common";
+
+@Injectable()
+export class MailService {
+  constructor(private mailerService: MailerService) {}
+
+  public async sendLoginEmail(name: string, email: string): Promise<void> {
+    try {
+      const mailOptions = {
+        to: email,
+        subject: "Login to Your Account",
+        html: `
+      <!DOCTYPE html>
+      <html lang="en">
+        <head>
+          <meta charset="UTF-8" />
+          <title>Login</title>
+        </head>
+        <body
+          style="
+            margin: 0;
+            padding: 0;
+            background-color: #f4f6f8;
+            font-family: Arial, sans-serif;
+          "
+        >
+          <table
+            role="presentation"
+            border="0"
+            cellpadding="0"
+            cellspacing="0"
+            width="100%"
+          >
+            <tr>
+              <td align="center" style="padding: 40px 0">
+                <table
+                  border="0"
+                  cellpadding="0"
+                  cellspacing="0"
+                  width="100%"
+                  style="
+                    max-width: 600px;
+                    background: #ffffff;
+                    border-radius: 10px;
+                    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+                    overflow: hidden;
+                  "
+                >
+                  <!-- Header -->
+                  <tr>
+                    <td
+                      align="center"
+                      style="padding: 25px; background-color: #10a5b1; color: #fff"
+                    >
+                      <h2 style="margin: 0; font-size: 20px">Login Alert</h2>
+                    </td>
+                  </tr>
+
+                  <!-- Message -->
+                  <tr>
+                    <td
+                      style="
+                        padding: 30px;
+                        color: #3d4d58;
+                        font-size: 15px;
+                        line-height: 1.6;
+                      "
+                    >
+                      <p style="margin: 0">
+                        Hi <b>${name}</b>, <br /><br />
+                        We noticed a successful login to your account (<b>${email}</b>).
+                      </p>
+
+                      <p style="margin: 20px 0 0 0">
+                        If this was you, no further action is required. If you didn’t
+                        make this login, we recommend resetting your password
+                        immediately.
+                      </p>
+                    </td>
+                  </tr>
+
+                  <!-- Footer -->
+                  <tr>
+                    <td
+                      align="center"
+                      style="padding: 20px; font-size: 12px; color: #aaa"
+                    >
+                      &copy; ${new Date().getFullYear()} Mojeeb AI. All rights reserved.
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </body>
+      </html>
+      `,
+      };
+
+      await this.mailerService.sendMail(mailOptions);
+    } catch (error) {
+      console.error("Error sending login email:", error);
+    }
+  }
+}

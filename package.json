@@ -9,10 +9,9 @@
     "node": ">=18.0.0"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
-    "build:prod": "tsc -p tsconfig.build.json && cp -r src/common/templates dist/common/ && cp -r src/shared/data dist/shared/data",
-    "copy:assets": "cp -r src/common/templates dist/common/ && cp -r src/shared/data dist/shared/data",
-    "copy:templates": "cp -r src/common/templates dist/common/",
+    "build": "nest build",
+    "copy:assets": "copyfiles -r src/mail/templates dist/mail/templates/ && copyfiles -r src/shared/data dist/shared/data",
+    "copy:templates": "copyfiles -r src/mail/templates dist/mail/templates/",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
@@ -39,7 +38,9 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2",
     "cloudinary": "^2.7.0",
+    "copyfiles": "^2.4.1",
     "dotenv": "^16.5.0",
+    "ejs": "^3.1.10",
     "handlebars": "^4.7.8",
     "jsonwebtoken": "^9.0.2",
     "nestjs-typeorm-paginate": "^4.1.0",
