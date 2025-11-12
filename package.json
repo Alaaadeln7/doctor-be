@@ -6,12 +6,11 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "build:prod": "NODE_ENV=production nest build && cp -r src/common/templates dist/common/ && cp -r src/shared/data dist/shared/data",
+    "build:prod": "tsc -p tsconfig.build.json && cp -r src/common/templates dist/common/ && cp -r src/shared/data dist/shared/data",
     "copy:assets": "cp -r src/common/templates dist/common/ && cp -r src/shared/data dist/shared/data",
     "copy:templates": "cp -r src/common/templates dist/common/",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
-    "build": "nest build",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
