@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import {
   BadRequestException,
   ConflictException,
@@ -18,7 +20,7 @@ import {
   updatePasswordDto,
 } from "../..//shared/dtos/doctor.dto";
 import { DoctorEntity, FileClass } from "../..//shared/entities/doctors.entity";
-import { Not, Repository } from "typeorm";
+import { Repository } from "typeorm";
 import { CredentialService } from "../credential/credential.service";
 import { InjectRepository } from "@nestjs/typeorm";
 import { PlanService } from "../plan/plan.service";
@@ -34,6 +36,7 @@ import { BcryptUtilService } from "../..//common/utils/bcrypt.util";
 import { CategoryService } from "../category/category.service";
 import { WorkingHoursEntity } from "../..//shared/entities/workinHours.entity";
 import { paginate } from "nestjs-typeorm-paginate";
+import { MailService } from "../../mail/mail.service";
 
 @Injectable()
 export class DoctorService {
@@ -45,12 +48,12 @@ export class DoctorService {
     private readonly credintialService: CredentialService,
     private readonly planService: PlanService,
     private readonly codeService: CodeUtilService,
-    private readonly emailService: MailUtilService,
     private readonly otpService: OtpUtilService,
     private readonly jwtService: JwtUtilService,
     private readonly config: ConfigService,
     private readonly bcryptService: BcryptUtilService,
-    private readonly categoryService: CategoryService
+    private readonly categoryService: CategoryService,
+    private readonly mailService: MailService
   ) {}
 
   async doctorSignup(
@@ -107,15 +110,16 @@ export class DoctorService {
     if (!savedDoctor) throw new ConflictException("Failed to save doctor");
 
     // Send a signup confirmation email with the OTP
-    this.emailService.sendMail({
-      to: savedDoctor.email,
-      subject: "DRS - Doctor Signup Confirmation",
-      template: "doctor_signup",
-      context: {
-        name: savedDoctor.fullName.fname + " " + savedDoctor.fullName.lname,
-        otp: savedDoctor.otp,
-      },
-    });
+    try {
+      await this.mailService.sendDoctorSignupEmail(
+        savedDoctor.fullName.fname + " " + savedDoctor.fullName.lname,
+        savedDoctor.email,
+        otp,
+        `${this.config.get<string>("FE_URL")}/doctor/verify-signup`
+      );
+    } catch (error) {
+      console.error("Error sending doctor signup email:", error);
+    }
     // generate token to use it in auth files upload
     const token = this.jwtService.generateToken({
       fullName: savedDoctor.fullName.fname + " " + savedDoctor.fullName.lname,
@@ -242,20 +246,20 @@ export class DoctorService {
       throw new ConflictException("Failed to update account data");
     }
 
-    // send email to verify the updated email
-    this.emailService.sendMail({
-      to: updatedDoctor.email,
-      subject: "DRS - Email Update Verification",
-      template: "doctor_update_email",
-      context: {
-        name: updatedDoctor.fullName.fname + " " + updatedDoctor.fullName.lname,
-        otp: updatedDoctor.otp,
-        link:
+    try {
+      await this.mailService.sendUpdateDoctorEmail(
+        updatedDoctor.fullName.fname + " " + updatedDoctor.fullName.lname,
+        updatedDoctor.email,
+        updatedDoctor.otp,
+        `${
           this.config.get<string>("envConfig.be.updateMyEmailRedirectionLink") +
           "/verify_update_email" +
-          `?token=${this.jwtService.generateToken({ email: updatedDoctor.email, id: updatedDoctor.id })}`,
-      },
-    });
+          `?token=${this.jwtService.generateToken({ email: updatedDoctor.email, id: updatedDoctor.id })}`
+        }`
+      );
+    } catch (error) {
+      console.error("Error sending doctor signup email:", error);
+    }
 
     return {
       fullName: `${updatedDoctor.fullName.fname} ${updatedDoctor.fullName.lname}`,
@@ -323,15 +327,12 @@ export class DoctorService {
       throw new ConflictException(
         "Something went wrong while updating doctor data"
       );
-    this.emailService.sendMail({
-      to: updatedDoctor.email,
-      subject: "DRS - Password Reset Request",
-      template: "doctor_reset_password_request",
-      context: {
-        name: updatedDoctor.fullName.fname + " " + updatedDoctor.fullName.lname,
-        otp: updatedDoctor.otp,
-      },
-    });
+    this.mailService.sendDoctorResetPasswordEmail(
+      updatedDoctor.fullName.fname + " " + updatedDoctor.fullName.lname,
+      updatedDoctor.email,
+      updatedDoctor.otp,
+      `${this.config.get<string>("envConfig.be.updateMyEmailRedirectionLink") + "/verify_update_email" + `?token=${this.jwtService.generateToken({ email: updatedDoctor.email, id: updatedDoctor.id })}`}`
+    );
     return {
       fullName: `${updatedDoctor.fullName.fname} ${updatedDoctor.fullName.lname}`,
       isActive: updatedDoctor.isActive,

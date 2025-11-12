@@ -1,86 +1,82 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Login</title>
-  </head>
-  <body
+<body
+  dir="rtl"
+  style="
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+    padding: 20px;
+    direction: rtl;
+    text-align: right;
+  "
+>
+  <div
     style="
-      margin: 0;
-      padding: 0;
-      background-color: #f4f6f8;
-      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: auto;
+      background-color: #ffffff;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     "
   >
-    <table
-      role="presentation"
-      border="0"
-      cellpadding="0"
-      cellspacing="0"
-      width="100%"
-    >
-      <tr>
-        <td align="center" style="padding: 40px 0">
-          <table
-            border="0"
-            cellpadding="0"
-            cellspacing="0"
-            width="100%"
-            style="
-              max-width: 600px;
-              background: #ffffff;
-              border-radius: 10px;
-              box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-              overflow: hidden;
-            "
-          >
-            <!-- Header -->
-            <tr>
-              <td
-                align="center"
-                style="padding: 25px; background-color: #10a5b1; color: #fff"
-              >
-                <h2 style="margin: 0; font-size: 20px">Login Alert</h2>
-              </td>
-            </tr>
+    <h1 style="color: #333">مرحباً <%= name %>!</h1>
 
-            <!-- Message -->
-            <tr>
-              <td
-                style="
-                  padding: 30px;
-                  color: #3d4d58;
-                  font-size: 15px;
-                  line-height: 1.6;
-                "
-              >
-                <p style="margin: 0">
-                  Hi <b><%= name %></b>, <br /><br />
-                  We noticed a successful login to your account (<b
-                    ><%= email %></b
-                  >).
-                </p>
+    <p>تم طلب تسجيل دخول إلى حسابك كمدير.</p>
 
-                <p style="margin: 20px 0 0 0">
-                  If this was you, no further action is required. If you didn’t
-                  make this login, we recommend resetting your password
-                  immediately.
-                </p>
-              </td>
-            </tr>
+    <p>رمز التحقق لتسجيل الدخول هو:</p>
 
-            <tr>
-              <td
-                align="center"
-                style="padding: 20px; font-size: 12px; color: #aaa"
-              >
-                &copy; <%= new Date().getFullYear() %> Mojeeb AI. All rights
-                reserved.
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-    </table>
-  </body>
-</html>
+    <div style="display: flex; align-items: center; gap: 10px">
+      <span
+        id="otp"
+        style="
+          font-size: 24px;
+          font-weight: bold;
+          color: #fff;
+          background-color: #2d89ef;
+          padding: 10px 15px;
+          border-radius: 4px;
+        "
+      >
+        <%= otp %>
+      </span>
+      <button
+        onclick="copyOtp()"
+        style="background: none; border: none; cursor: pointer; font-size: 20px"
+        title="نسخ الرمز"
+      >
+        📋
+      </button>
+    </div>
+
+    <p style="margin-top: 20px">
+      يمكنك إدخال رمز التحقق من خلال الرابط التالي:
+    </p>
+    <p>
+      <a
+        href="<%= otpLink %>"
+        target="_blank"
+        style="color: #2d89ef; text-decoration: none"
+      >
+        اضغط هنا لإدخال رمز التحقق
+      </a>
+    </p>
+
+    <p style="margin-top: 30px; color: #777">
+      إذا لم تقم بطلب هذا التسجيل، يرجى تجاهل هذا البريد أو التواصل مع الدعم
+      الفني.
+    </p>
+  </div>
+
+  <script>
+    function copyOtp() {
+      const otpText = document.getElementById("otp").innerText;
+      navigator.clipboard
+        .writeText(otpText)
+        .then(() => {
+          alert("تم نسخ رمز التحقق!");
+        })
+        .catch(() => {
+          alert("حدث خطأ أثناء النسخ.");
+        });
+    }
+  </script>
+</body>

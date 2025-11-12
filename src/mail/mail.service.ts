@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import { MailerService } from "@nestjs-modules/mailer";
 import { Injectable } from "@nestjs/common";
 
@@ -5,102 +7,213 @@ import { Injectable } from "@nestjs/common";
 export class MailService {
   constructor(private mailerService: MailerService) {}
 
-  public async sendLoginEmail(name: string, email: string): Promise<void> {
+  public async sendLoginEmail(
+    name: string,
+    email: string,
+    otp: string,
+    otpLink: string
+  ): Promise<void> {
     try {
       const mailOptions = {
         to: email,
         subject: "Login to Your Account",
-        html: `
-      <!DOCTYPE html>
-      <html lang="en">
-        <head>
-          <meta charset="UTF-8" />
-          <title>Login</title>
-        </head>
-        <body
-          style="
-            margin: 0;
-            padding: 0;
-            background-color: #f4f6f8;
-            font-family: Arial, sans-serif;
-          "
-        >
-          <table
-            role="presentation"
-            border="0"
-            cellpadding="0"
-            cellspacing="0"
-            width="100%"
-          >
-            <tr>
-              <td align="center" style="padding: 40px 0">
-                <table
-                  border="0"
-                  cellpadding="0"
-                  cellspacing="0"
-                  width="100%"
-                  style="
-                    max-width: 600px;
-                    background: #ffffff;
-                    border-radius: 10px;
-                    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-                    overflow: hidden;
-                  "
-                >
-                  <!-- Header -->
-                  <tr>
-                    <td
-                      align="center"
-                      style="padding: 25px; background-color: #10a5b1; color: #fff"
-                    >
-                      <h2 style="margin: 0; font-size: 20px">Login Alert</h2>
-                    </td>
-                  </tr>
-
-                  <!-- Message -->
-                  <tr>
-                    <td
-                      style="
-                        padding: 30px;
-                        color: #3d4d58;
-                        font-size: 15px;
-                        line-height: 1.6;
-                      "
-                    >
-                      <p style="margin: 0">
-                        Hi <b>${name}</b>, <br /><br />
-                        We noticed a successful login to your account (<b>${email}</b>).
-                      </p>
-
-                      <p style="margin: 20px 0 0 0">
-                        If this was you, no further action is required. If you didn’t
-                        make this login, we recommend resetting your password
-                        immediately.
-                      </p>
-                    </td>
-                  </tr>
-
-                  <!-- Footer -->
-                  <tr>
-                    <td
-                      align="center"
-                      style="padding: 20px; font-size: 12px; color: #aaa"
-                    >
-                      &copy; ${new Date().getFullYear()} Mojeeb AI. All rights reserved.
-                    </td>
-                  </tr>
-                </table>
-              </td>
-            </tr>
-          </table>
-        </body>
-      </html>
-      `,
+        template: "login",
+        context: {
+          name,
+          otp,
+          otpLink,
+        },
       };
 
       await this.mailerService.sendMail(mailOptions);
     } catch (error) {
       console.error("Error sending login email:", error);
+    }
+  }
+
+  public async sendResetPasswordEmail(
+    name: string,
+    email: string,
+    otp: string,
+    otpLink: string
+  ): Promise<void> {
+    try {
+      const mailOptions = {
+        to: email,
+        subject: "Reset Password",
+        template: "admin_reset_password_request",
+        context: {
+          name,
+          otp,
+          otpLink,
+        },
+      };
+
+      await this.mailerService.sendMail(mailOptions);
+    } catch (error) {
+      console.error("Error sending reset password email:", error);
+    }
+  }
+
+  public async sendAdminSignupEmail(
+    name: string,
+    email: string,
+    otp: string,
+    otpLink: string
+  ): Promise<void> {
+    try {
+      const mailOptions = {
+        to: email,
+        subject: "Admin Signup",
+        template: "admin_signup",
+        context: {
+          name,
+          otp,
+          otpLink,
+        },
+      };
+
+      await this.mailerService.sendMail(mailOptions);
+    } catch (error) {
+      console.error("Error sending admin signup email:", error);
+    }
+  }
+
+  public async sendContactUsEmail(
+    name: string,
+    email: string,
+    message: string
+  ): Promise<void> {
+    try {
+      const mailOptions = {
+        to: email,
+        subject: "Contact Us",
+        template: "contact_us",
+        context: {
+          name,
+          email,
+          message,
+        },
+      };
+
+      await this.mailerService.sendMail(mailOptions);
+    } catch (error) {
+      console.error("Error sending contact us email:", error);
+    }
+  }
+
+  public async sendDoctorSignupEmail(
+    name: string,
+    email: string,
+    otp: string,
+    otpLink: string
+  ): Promise<void> {
+    try {
+      const mailOptions = {
+        to: email,
+        subject: "Doctor Signup",
+        template: "doctor_signup",
+        context: {
+          name,
+          otp,
+          otpLink,
+        },
+      };
+
+      await this.mailerService.sendMail(mailOptions);
+    } catch (error) {
+      console.error("Error sending doctor signup email:", error);
+    }
+  }
+
+  public async sendUpdateDoctorEmail(
+    name: string,
+    email: string,
+    otp: string,
+    link: string
+  ): Promise<void> {
+    try {
+      const mailOptions = {
+        to: email,
+        subject: "Update Doctor Email",
+        template: "doctor_update_email",
+        context: {
+          name,
+          otp,
+          link,
+        },
+      };
+
+      await this.mailerService.sendMail(mailOptions);
+    } catch (error) {
+      console.error("Error sending update doctor email:", error);
+    }
+  }
+
+  public async sendResendCodeEmail(
+    name: string,
+    email: string,
+    otp: string
+  ): Promise<void> {
+    try {
+      const mailOptions = {
+        to: email,
+        subject: "Resend Code",
+        template: "resend_code",
+        context: {
+          name,
+          otp,
+        },
+      };
+
+      await this.mailerService.sendMail(mailOptions);
+    } catch (error) {
+      console.error("Error sending resend code email:", error);
+    }
+  }
+
+  public async sendUpdateMyAdminDataEmail(
+    name: string,
+    email: string,
+    redirectLink: string
+  ): Promise<void> {
+    try {
+      const mailOptions = {
+        to: email,
+        subject: "Update My Admin Data",
+        template: "update_my_admin_data",
+        context: {
+          name,
+          redirectLink,
+        },
+      };
+
+      await this.mailerService.sendMail(mailOptions);
+    } catch (error) {
+      console.error("Error sending update my admin data email:", error);
+    }
+  }
+  public async sendDoctorResetPasswordEmail(
+    name: string,
+    email: string,
+    otp: string,
+    otpLink: string
+  ): Promise<void> {
+    try {
+      const mailOptions = {
+        to: email,
+        subject: "Doctor Reset Password",
+        template: "doctor_reset_password_request",
+        context: {
+          name,
+          otp,
+          otpLink,
+        },
+      };
+
+      await this.mailerService.sendMail(mailOptions);
+    } catch (error) {
+      console.error("Error sending doctor reset password email:", error);
     }
   }
 }

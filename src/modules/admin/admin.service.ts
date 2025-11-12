@@ -13,7 +13,7 @@ import { Repository } from "typeorm";
 import { BcryptUtilService } from "../../common/utils/bcrypt.util";
 import { JwtUtilService } from "../../common/utils/jwt.utils";
 import { OtpUtilService } from "../../common/utils/otp.util";
-import { MailService } from "src/mail/mail.service";
+import { MailService } from "../../mail/mail.service";
 import { AdminEntity } from "../../shared/entities/admins.entity";
 import {
   BlockAdminDtoResponse,
@@ -71,13 +71,16 @@ export class AdminService {
     const otp = this.otpService.generateComplexOtp(6);
     newAdmin.otp = otp;
 
-    // TODO: Uncomment when mail service is ready
-    // await this.mailService.sendMail({
-    //   to: email,
-    //   subject: "DRS Automated Email - Please follow the steps below",
-    //   template: "admin_signup",
-    //   context: { name, otp, otpLink: "https://www.google.com" },
-    // });
+    try {
+      await this.mailService.sendAdminSignupEmail(
+        newAdmin.name,
+        newAdmin.email,
+        newAdmin.otp,
+        "https://yourapp.com/admin/verify-signup"
+      );
+    } catch (error) {
+      console.error("Error sending admin signup email:", error);
+    }
 
     const savedAdmin = await this.adminRepo.save(newAdmin);
 
@@ -138,17 +141,16 @@ export class AdminService {
     const otp = this.otpService.generateComplexOtp(6);
     admin.otp = otp;
 
-    // TODO: Uncomment when mail service is ready
-    // await this.mailService.sendMail({
-    //   to: email,
-    //   subject: "DRS Automated Email - Please follow the steps below",
-    //   template: "admin_login",
-    //   context: {
-    //     name: admin.name,
-    //     otp,
-    //     otpLink: "https://www.google.com",
-    //   },
-    // });
+    try {
+      await this.mailService.sendLoginEmail(
+        admin.name,
+        admin.email,
+        admin.otp,
+        "https://yourapp.com/admin/verify-signup"
+      );
+    } catch (error) {
+      console.error("Error sending admin signup email:", error);
+    }
 
     await this.adminRepo.save(admin);
 
@@ -196,7 +198,12 @@ export class AdminService {
     });
 
     try {
-      await this.mailService.sendLoginEmail(admin.name, admin.email);
+      await this.mailService.sendLoginEmail(
+        admin.name,
+        admin.email,
+        otp,
+        "https://www.google.com"
+      );
     } catch (error) {
       console.error("Failed to send login email:", error);
     }
@@ -225,17 +232,16 @@ export class AdminService {
     const otp = this.otpService.generateComplexOtp(6);
     admin.otp = otp;
 
-    // TODO: Uncomment when mail service is ready
-    // await this.mailService.sendMail({
-    //   to: data.email,
-    //   subject: "DRS Automated Email - Please follow the steps below",
-    //   template: "admin_reset_password_request",
-    //   context: {
-    //     name: admin.name,
-    //     otp,
-    //     otpLink: "https://www.google.com",
-    //   },
-    // });
+    try {
+      await this.mailService.sendResetPasswordEmail(
+        admin.name,
+        admin.email,
+        otp,
+        `${this.configService.get<string>("FE_URL")}`
+      );
+    } catch (error) {
+      console.error("Failed to send login email:", error);
+    }
 
     await this.adminRepo.save(admin);
 
@@ -307,18 +313,15 @@ export class AdminService {
         "1h"
       );
 
-      // TODO: Uncomment when mail service is ready
-      // await this.mailService.sendMail({
-      //   to: email,
-      //   subject: "DRS Automated Email - Please follow the steps below",
-      //   template: "update_my_admin_data",
-      //   context: {
-      //     name: admin.name,
-      //     redirectLink: this.configService.get<string>(
-      //       "envConfig.links.updateMyEmailRedirectionLink"
-      //     ) + token,
-      //   },
-      // });
+      try {
+        await this.mailService.sendUpdateMyAdminDataEmail(
+          admin.name,
+          admin.email,
+          `${this.configService.get<string>("FE_URL")}/${token}`
+        );
+      } catch (error) {
+        console.error("Failed to send login email:", error);
+      }
 
       admin.isVerified = false;
     }
