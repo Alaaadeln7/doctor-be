@@ -4,7 +4,6 @@ import { CommonController } from "./common.controller";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { AdminEntity } from "../../shared/entities/admins.entity";
 import { DoctorEntity } from "../../shared/entities/doctors.entity";
-import { MailUtilService } from "../../common/utils/mail.util";
 import { OtpUtilService } from "../../common/utils/otp.util";
 import { CategoryEntity } from "../../shared/entities/categoris.entity";
 import { CategoryService } from "../category/category.service";
@@ -16,13 +15,7 @@ import { MailModule } from "../../mail/mail.module";
     TypeOrmModule.forFeature([AdminEntity, DoctorEntity, CategoryEntity]),
     MailModule,
   ],
-  providers: [
-    CommonService,
-    MailUtilService,
-    OtpUtilService,
-    CategoryService,
-    LocationService,
-  ],
+  providers: [CommonService, OtpUtilService, CategoryService, LocationService],
   controllers: [CommonController],
 })
 export class CommonModule {}

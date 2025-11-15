@@ -9,7 +9,6 @@ import { BcryptUtilService } from "../../common/utils/bcrypt.util";
 import { CodeUtilService } from "../../common/utils/code.util";
 import { JwtUtilService } from "../../common/utils/jwt.utils";
 import { OtpUtilService } from "../../common/utils/otp.util";
-import { MailUtilService } from "../../common/utils/mail.util";
 import { CategoryModule } from "../category/category.module";
 import { WorkingHoursEntity } from "../../shared/entities/workinHours.entity";
 import { MailModule } from "../../mail/mail.module";
@@ -29,7 +28,6 @@ import { MailModule } from "../../mail/mail.module";
     CodeUtilService,
     JwtUtilService,
     OtpUtilService,
-    MailUtilService,
     BcryptUtilService,
   ],
 })

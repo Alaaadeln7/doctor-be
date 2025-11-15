@@ -25,7 +25,6 @@ import { CredentialService } from "../credential/credential.service";
 import { InjectRepository } from "@nestjs/typeorm";
 import { PlanService } from "../plan/plan.service";
 import { CodeUtilService } from "../..//common/utils/code.util";
-import { MailUtilService } from "../..//common/utils/mail.util";
 import { OtpUtilService } from "../..//common/utils/otp.util";
 import { DoctorResponseType } from "../..//shared/type/doctor.type";
 import { JwtUtilService } from "../..//common/utils/jwt.utils";

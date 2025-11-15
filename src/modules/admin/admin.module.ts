@@ -9,7 +9,6 @@ import { JwtUtilService } from "../..//common/utils/jwt.utils";
 import { ThrottlerModule } from "@nestjs/throttler";
 import { APP_GUARD } from "@nestjs/core";
 import { CustomThrottlerGuard } from "../../common/guards/throttle.quard";
-import { MailUtilService } from "../../common/utils/mail.util";
 import { OtpUtilService } from "../../common/utils/otp.util";
 import { MailModule } from "../../mail/mail.module";
 
@@ -31,7 +30,6 @@ import { MailModule } from "../../mail/mail.module";
     AdminService,
     BcryptUtilService,
     CheckAdminExistPipe,
-    MailUtilService,
     OtpUtilService,
     JwtUtilService,
     {

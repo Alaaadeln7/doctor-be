@@ -1,219 +1,161 @@
 /* eslint-disable */
 
-import { MailerService } from "@nestjs-modules/mailer";
 import { Injectable } from "@nestjs/common";
+import { MailerService } from "@nestjs-modules/mailer";
 
+/** Central mail service using EJS templates */
 @Injectable()
 export class MailService {
-  constructor(private mailerService: MailerService) {}
+  constructor(private readonly mailer: MailerService) {}
 
-  public async sendLoginEmail(
+  /** Generic method to send any template email */
+  private async sendTemplateEmail(params: {
+    to: string;
+    subject: string;
+    template: string;
+    context: any;
+  }): Promise<void> {
+    try {
+      await this.mailer.sendMail({
+        to: params.to,
+        subject: params.subject,
+        template: params.template,
+        context: params.context,
+      });
+    } catch (err) {
+      console.error(`Error sending ${params.template} email:`, err);
+    }
+  }
+
+  /** Send login email */
+  async sendLoginEmail(
     name: string,
     email: string,
     otp: string,
     otpLink: string
   ): Promise<void> {
-    try {
-      const mailOptions = {
-        to: email,
-        subject: "Login to Your Account",
-        template: "login",
-        context: {
-          name,
-          otp,
-          otpLink,
-        },
-      };
-
-      await this.mailerService.sendMail(mailOptions);
-    } catch (error) {
-      console.error("Error sending login email:", error);
-    }
+    return this.sendTemplateEmail({
+      to: email,
+      subject: "Login to Your Account",
+      template: "login",
+      context: { name, email, otp, otpLink },
+    });
   }
 
-  public async sendResetPasswordEmail(
+  /** Send reset password email */
+  async sendResetPasswordEmail(
     name: string,
     email: string,
     otp: string,
     otpLink: string
   ): Promise<void> {
-    try {
-      const mailOptions = {
-        to: email,
-        subject: "Reset Password",
-        template: "admin_reset_password_request",
-        context: {
-          name,
-          otp,
-          otpLink,
-        },
-      };
-
-      await this.mailerService.sendMail(mailOptions);
-    } catch (error) {
-      console.error("Error sending reset password email:", error);
-    }
+    return this.sendTemplateEmail({
+      to: email,
+      subject: "Reset Your Password",
+      template: "admin_reset_password_request",
+      context: { name, email, otp, otpLink },
+    });
   }
 
-  public async sendAdminSignupEmail(
+  /** Admin signup / verify email */
+  async sendAdminSignupEmail(
     name: string,
     email: string,
     otp: string,
     otpLink: string
   ): Promise<void> {
-    try {
-      const mailOptions = {
-        to: email,
-        subject: "Admin Signup",
-        template: "admin_signup",
-        context: {
-          name,
-          otp,
-          otpLink,
-        },
-      };
-
-      await this.mailerService.sendMail(mailOptions);
-    } catch (error) {
-      console.error("Error sending admin signup email:", error);
-    }
+    return this.sendTemplateEmail({
+      to: email,
+      subject: "Admin Account Verification",
+      template: "admin_signup",
+      context: { name, email, otp, otpLink },
+    });
   }
 
-  public async sendContactUsEmail(
+  /** Contact-us confirmation email */
+  async sendContactUsEmail(
     name: string,
     email: string,
     message: string
   ): Promise<void> {
-    try {
-      const mailOptions = {
-        to: email,
-        subject: "Contact Us",
-        template: "contact_us",
-        context: {
-          name,
-          email,
-          message,
-        },
-      };
-
-      await this.mailerService.sendMail(mailOptions);
-    } catch (error) {
-      console.error("Error sending contact us email:", error);
-    }
+    return this.sendTemplateEmail({
+      to: email,
+      subject: "Your Message Was Received",
+      template: "contact_us",
+      context: { name, email, message },
+    });
   }
 
-  public async sendDoctorSignupEmail(
+  /** Doctor signup email */
+  async sendDoctorSignupEmail(
     name: string,
     email: string,
     otp: string,
     otpLink: string
   ): Promise<void> {
-    try {
-      const mailOptions = {
-        to: email,
-        subject: "Doctor Signup",
-        template: "doctor_signup",
-        context: {
-          name,
-          otp,
-          otpLink,
-        },
-      };
-
-      await this.mailerService.sendMail(mailOptions);
-    } catch (error) {
-      console.error("Error sending doctor signup email:", error);
-    }
+    return this.sendTemplateEmail({
+      to: email,
+      subject: "Doctor Account Verification",
+      template: "doctor_signup",
+      context: { name, email, otp, otpLink },
+    });
   }
 
-  public async sendUpdateDoctorEmail(
+  /** Doctor email update confirmation */
+  async sendUpdateDoctorEmail(
     name: string,
     email: string,
     otp: string,
     link: string
   ): Promise<void> {
-    try {
-      const mailOptions = {
-        to: email,
-        subject: "Update Doctor Email",
-        template: "doctor_update_email",
-        context: {
-          name,
-          otp,
-          link,
-        },
-      };
-
-      await this.mailerService.sendMail(mailOptions);
-    } catch (error) {
-      console.error("Error sending update doctor email:", error);
-    }
+    return this.sendTemplateEmail({
+      to: email,
+      subject: "Confirm Email Update",
+      template: "doctor_update_email",
+      context: { name, email, otp, link },
+    });
   }
 
-  public async sendResendCodeEmail(
+  /** Resend OTP code */
+  async sendResendCodeEmail(
     name: string,
     email: string,
     otp: string
   ): Promise<void> {
-    try {
-      const mailOptions = {
-        to: email,
-        subject: "Resend Code",
-        template: "resend_code",
-        context: {
-          name,
-          otp,
-        },
-      };
-
-      await this.mailerService.sendMail(mailOptions);
-    } catch (error) {
-      console.error("Error sending resend code email:", error);
-    }
+    return this.sendTemplateEmail({
+      to: email,
+      subject: "Your Verification Code",
+      template: "resend_code",
+      context: { name, email, otp },
+    });
   }
 
-  public async sendUpdateMyAdminDataEmail(
+  /** Admin updated his data */
+  async sendUpdateMyAdminDataEmail(
     name: string,
     email: string,
     redirectLink: string
   ): Promise<void> {
-    try {
-      const mailOptions = {
-        to: email,
-        subject: "Update My Admin Data",
-        template: "update_my_admin_data",
-        context: {
-          name,
-          redirectLink,
-        },
-      };
-
-      await this.mailerService.sendMail(mailOptions);
-    } catch (error) {
-      console.error("Error sending update my admin data email:", error);
-    }
+    return this.sendTemplateEmail({
+      to: email,
+      subject: "Admin Data Updated",
+      template: "update_my_admin_data",
+      context: { name, email, redirectLink },
+    });
   }
-  public async sendDoctorResetPasswordEmail(
+
+  /** Doctor reset password email */
+  async sendDoctorResetPasswordEmail(
     name: string,
     email: string,
     otp: string,
     otpLink: string
   ): Promise<void> {
-    try {
-      const mailOptions = {
-        to: email,
-        subject: "Doctor Reset Password",
-        template: "doctor_reset_password_request",
-        context: {
-          name,
-          otp,
-          otpLink,
-        },
-      };
-
-      await this.mailerService.sendMail(mailOptions);
-    } catch (error) {
-      console.error("Error sending doctor reset password email:", error);
-    }
+    return this.sendTemplateEmail({
+      to: email,
+      subject: "Reset Your Password",
+      template: "doctor_reset_password_request",
+      context: { name, email, otp, otpLink },
+    });
   }
 }

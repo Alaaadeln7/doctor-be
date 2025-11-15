@@ -29,7 +29,7 @@ import {
   updatePagesResponseDto,
   VerifyAdminDtoResponse,
   VerifyAdminSignupDto,
-} from "../..//shared/dtos/admin.dto";
+} from "../../shared/dtos/admin.dto";
 import { AdminService } from "./admin.service";
 import { Throttle } from "@nestjs/throttler";
 import { Public } from "../..//common/decorators/public.decorator";
