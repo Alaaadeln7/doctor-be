@@ -163,6 +163,6 @@ const DoctorVerifyUpdateEmail = (doctorName: string): string => {
   <script src="https://kit.fontawesome.com/5c885545a0.js" crossorigin="anonymous"></script>
 </body>
 </html>`;
-}
+};
 
 export default DoctorVerifyUpdateEmail;
