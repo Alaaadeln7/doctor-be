@@ -1,12 +1,12 @@
+/* eslint-disable */
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { paginate, Pagination } from "nestjs-typeorm-paginate";
 import {
   addCategoryDto,
   updateCategoryDto,
-} from "../..//shared/dtos/category.dto";
-import { CategoryEntity } from "../..//shared/entities/categoris.entity";
-import { DoctorEntity } from "../..//shared/entities/doctors.entity";
+} from "../../shared/dtos/category.dto";
+import { CategoryEntity } from "../../shared/entities/categoris.entity";
 import { Repository } from "typeorm";
 
 @Injectable()

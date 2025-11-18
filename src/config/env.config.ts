@@ -1,17 +1,16 @@
-import { registerAs } from '@nestjs/config';
-import * as env from 'dotenv';
-import * as path from 'path';
+import { registerAs } from "@nestjs/config";
+import * as env from "dotenv";
+import * as path from "path";
 
-export default registerAs('envConfig', () => {
+export default registerAs("envConfig", () => {
   const nodeEnv = process.env.NODE_ENV;
 
-  let envPath;
+  let envPath: string;
 
-  if (nodeEnv === 'production') {
-    envPath = path.resolve(__dirname, '../../.env.prod');
-  }
-  else {
-    envPath = path.resolve(__dirname, '../../.env.dev');
+  if (nodeEnv === "production") {
+    envPath = path.resolve(__dirname, "../../.env.prod");
+  } else {
+    envPath = path.resolve(__dirname, "../../.env.dev");
   }
 
   env.config({ path: envPath });
@@ -43,18 +42,19 @@ export default registerAs('envConfig', () => {
     },
     links: {
       // updateMyAdminData
-      updateMyEmailRedirectionLink: process.env.UPDATE_MY_EMAIL_REDIRECTION_LINK
+      updateMyEmailRedirectionLink:
+        process.env.UPDATE_MY_EMAIL_REDIRECTION_LINK,
     },
     cloudinary: {
       name: process.env.CLOUDINARY_NAME,
       key: process.env.CLOUDINARY_API_KEY,
-      secret: process.env.CLOUDINARY_API_SECRET
+      secret: process.env.CLOUDINARY_API_SECRET,
     },
     fe: {
-      url: process.env.FRONTEND_URL || 'http://localhost:3000/'
+      url: process.env.FRONTEND_URL || "http://localhost:3000/",
     },
     be: {
-      url: process.env.BACKEND_URL || 'http://localhost:3000/'
-    }
+      url: process.env.BACKEND_URL || "http://localhost:3000/",
+    },
   };
 });

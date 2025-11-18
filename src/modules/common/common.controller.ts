@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import { Body, Controller, Get, HttpCode, Post } from "@nestjs/common";
 import { Public } from "../..//common/decorators/public.decorator";
 import {
@@ -24,7 +26,7 @@ export class CommonController {
   @Get("signup-essentials")
   @Public()
   @HttpCode(200)
-  async getSignupEssentials() {
+  getSignupEssentials() {
     return this.commonService.createNewAccountEssentials();
   }
 

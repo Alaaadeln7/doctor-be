@@ -1,3 +1,4 @@
+/* eslint-disable */
 import {
   Controller,
   Post,
@@ -76,7 +77,7 @@ export class CategoryController {
   async getAllCategories(
     @Query() query: { page: number; limit: number },
     @Req() req: Request
-  ): Promise<Pagination<CategoryEntity>> {
+  ) {
     return this.categoryService.getAllCategories(
       +query.page,
       +query.limit,

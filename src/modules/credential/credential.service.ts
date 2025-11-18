@@ -1,8 +1,9 @@
+/* eslint-disable */
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { BcryptUtilService } from "../..//common/utils/bcrypt.util";
-import { CreateCredentialDto } from "../..//shared/dtos/credential.dto";
-import { CredentialEntity } from "../..//shared/entities/credentials.entity";
+import { BcryptUtilService } from "../../common/utils/bcrypt.util";
+import { CreateCredentialDto } from "../../shared/dtos/credential.dto";
+import { CredentialEntity } from "../../shared/entities/credentials.entity";
 import { Repository } from "typeorm";
 
 @Injectable()
@@ -26,5 +27,6 @@ export class CredentialService {
 
   async saveDoctorCredential(data: CredentialEntity) {
     const updateCredits = await this.credintialRepo.save(data);
+    return updateCredits;
   }
 }

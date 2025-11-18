@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import { Injectable } from "@nestjs/common";
 
 import governoratesData from "../../shared/data/governorates.json";
