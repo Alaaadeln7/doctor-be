@@ -23,7 +23,7 @@ import {
   DoctorProfileImgDto,
 } from "../..//shared/dtos/file.dto";
 import { FileService } from "./file.service";
-import type { Request } from "express";
+import { Request } from "express";
 
 export type FilesType = {
   card?: Express.Multer.File[];

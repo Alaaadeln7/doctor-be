@@ -8,7 +8,7 @@ import {
   HttpStatus,
 } from "@nestjs/common";
 import { QueryFailedError } from "typeorm";
-import type { Response } from "express";
+import { Response } from "express";
 
 export default class ResponseFormatInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler) {
