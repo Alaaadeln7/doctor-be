@@ -29,7 +29,7 @@ import { OtpUtilService } from "../..//common/utils/otp.util";
 import { DoctorResponseType } from "../..//shared/type/doctor.type";
 import { JwtUtilService } from "../..//common/utils/jwt.utils";
 import { ConfigService } from "@nestjs/config";
-import { Response } from "express";
+import type { Response } from "express";
 import DoctorVerifyUpdateEmail from "../..//common/pages/doctor.verifyUpdateEmail";
 import { BcryptUtilService } from "../..//common/utils/bcrypt.util";
 import { CategoryService } from "../category/category.service";

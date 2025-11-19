@@ -36,7 +36,7 @@ import {
   ApiQuery,
 } from "@nestjs/swagger";
 import { JwtUtilService } from "../..//common/utils/jwt.utils";
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import { DoctorEntity, FileClass } from "../..//shared/entities/doctors.entity";
 
 @Controller("doctor")
