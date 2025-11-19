@@ -3,9 +3,7 @@ import { Module } from "@nestjs/common";
 import { MailerModule } from "@nestjs-modules/mailer";
 import { ConfigService } from "@nestjs/config";
 import { MailService } from "./mail.service";
-import { MailController } from "./mail.controller";
 @Module({
-  controllers: [MailController],
   imports: [
     MailerModule.forRootAsync({
       inject: [ConfigService],
@@ -14,7 +12,7 @@ import { MailController } from "./mail.controller";
           transport: {
             host: config.get<string>("SMTP_HOST"),
             port: config.get<number>("SMTP_PORT"),
-            secure: config.get<string>("SMTP_SECURITY") === "SSL",
+            secure: true,
             auth: {
               user: config.get<string>("SMTP_USERNAME"),
               pass: config.get<string>("SMTP_PASSWORD"),
