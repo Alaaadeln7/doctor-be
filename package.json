@@ -9,7 +9,7 @@
     "node": ">=18.0.0"
   },
   "scripts": {
-    "build": "npx nest build",
+    "build": "npx @nestjs/cli build",
     "copy:assets": "copyfiles -r src/mail/templates dist/mail/templates/ && copyfiles -r src/shared/data dist/shared/data",
     "copy:templates": "copyfiles -r src/mail/templates dist/mail/templates/",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
