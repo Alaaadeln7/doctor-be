@@ -9,7 +9,7 @@
     "node": ">=18.0.0"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
+    "build": "npx @nestjs/cli build && tsc -p tsconfig.build.json",
     "copy:assets": "copyfiles -r src/mail/templates dist/mail/templates/ && copyfiles -r src/shared/data dist/shared/data",
     "copy:templates": "copyfiles -r src/mail/templates dist/mail/templates/",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",

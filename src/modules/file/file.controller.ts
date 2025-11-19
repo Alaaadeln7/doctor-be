@@ -25,6 +25,7 @@ import {
 import { FileService } from "./file.service";
 import type { Request } from "express";
 import { Express } from "express";
+
 export type FilesType = {
   card?: Express.Multer.File[];
   fid?: Express.Multer.File[];
