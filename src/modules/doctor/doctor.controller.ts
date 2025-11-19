@@ -36,7 +36,7 @@ import {
   ApiQuery,
 } from "@nestjs/swagger";
 import { JwtUtilService } from "../..//common/utils/jwt.utils";
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import { DoctorEntity, FileClass } from "../..//shared/entities/doctors.entity";
 
 @Controller("doctor")
@@ -63,9 +63,7 @@ export class DoctorController {
   @Post("/login")
   @Public()
   @HttpCode(200)
-  async doctorLogin(
-    @Body() data: LoginDoctorDto
-  ): Promise<{
+  async doctorLogin(@Body() data: LoginDoctorDto): Promise<{
     token: string;
     doctor: {
       name: { fname: string; lname: string };
