@@ -10,7 +10,7 @@ import { StorageUtilService } from "../..//common/utils/storage.util";
 import { DoctorEntity } from "../..//shared/entities/doctors.entity";
 import { Repository } from "typeorm";
 import { FilesType } from "./file.controller";
-
+import { Express } from "express";
 @Injectable()
 export class FileService {
   constructor(
