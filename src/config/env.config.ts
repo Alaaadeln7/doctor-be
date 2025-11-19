@@ -1,60 +1,62 @@
 import { registerAs } from "@nestjs/config";
-import * as env from "dotenv";
-import * as path from "path";
+import * as dotenv from "dotenv";
+
+dotenv.config({ path: ".env" });
 
 export default registerAs("envConfig", () => {
-  const nodeEnv = process.env.NODE_ENV;
-
-  let envPath: string;
-
-  if (nodeEnv === "production") {
-    envPath = path.resolve(__dirname, "../../.env.prod");
-  } else {
-    envPath = path.resolve(__dirname, "../../.env.dev");
-  }
-
-  env.config({ path: envPath });
+  const isProd = process.env.NODE_ENV === "production";
 
   return {
     system: {
       node_env: process.env.NODE_ENV,
-      port: process.env.PORT || 3000,
+      port: isProd ? process.env.PORT_PROD : process.env.PORT_DEV,
     },
-    email: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-      reciever: process.env.EMAIL_RECIEVER,
+
+    smtp: {
+      host: process.env.SMTP_HOST,
+      user: process.env.SMTP_USERNAME,
+      pass: process.env.SMTP_PASSWORD,
+      port: process.env.SMTP_PORT,
+      security: process.env.SMTP_SECURITY,
+      fromEmail: process.env.EMAIL_FROM_ADDRESS,
+      fromName: process.env.EMAIL_FROM_NAME,
     },
+
     jwt: {
       pass: process.env.JWT_PASS,
       exp: process.env.JWT_EXPIRES_IN,
     },
+
     bcrypt: {
       salting: process.env.BCRYPT_SALTING,
     },
+
     db: {
-      type: process.env.DB_TYPE,
-      user: process.env.DB_USER,
-      pass: process.env.DB_PASS,
-      host: process.env.DB_HOST,
-      port: process.env.DB_PORT,
-      name: process.env.DB_NAME,
+      type: isProd ? process.env.DB_TYPE_PROD : process.env.DB_TYPE_DEV,
+      user: isProd ? process.env.DB_USER_PROD : process.env.DB_USER_DEV,
+      pass: isProd ? process.env.DB_PASS_PROD : process.env.DB_PASS_DEV,
+      host: isProd ? process.env.DB_HOST_PROD : process.env.DB_HOST_DEV,
+      port: isProd ? process.env.DB_PORT_PROD : process.env.DB_PORT_DEV,
+      name: isProd ? process.env.DB_NAME_PROD : process.env.DB_NAME_DEV,
     },
+
     links: {
-      // updateMyAdminData
       updateMyEmailRedirectionLink:
         process.env.UPDATE_MY_EMAIL_REDIRECTION_LINK,
     },
+
     cloudinary: {
       name: process.env.CLOUDINARY_NAME,
       key: process.env.CLOUDINARY_API_KEY,
       secret: process.env.CLOUDINARY_API_SECRET,
     },
+
     fe: {
-      url: process.env.FRONTEND_URL || "http://localhost:3000/",
+      url: process.env.FE_URL,
     },
+
     be: {
-      url: process.env.BACKEND_URL || "http://localhost:3000/",
+      url: process.env.BE_URL,
     },
   };
 });
