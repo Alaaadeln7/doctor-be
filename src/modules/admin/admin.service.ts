@@ -32,6 +32,7 @@ import {
   VerifyAdminDtoResponse,
   VerifyAdminSignupDto,
 } from "../../shared/dtos/admin.dto";
+import response from "../../common/utils/response.pattern";
 
 /**
  * Service for managing admin operations including authentication, profile management, and admin CRUD
@@ -389,7 +390,7 @@ export class AdminService {
    * @returns Admin entity without sensitive fields
    * @throws NotFoundException if admin not found
    */
-  async getMyAdminData(id: number): Promise<AdminEntity> {
+  async getMyAdminData(id: number) {
     const admin = await this.adminRepo.findOne({
       where: { id },
       select: {
@@ -407,7 +408,11 @@ export class AdminService {
       throw new NotFoundException("Admin not found");
     }
 
-    return admin;
+    return response({
+      message: "Admin found successfully",
+      data: admin,
+      statusCode: 200,
+    });
   }
 
   /**
