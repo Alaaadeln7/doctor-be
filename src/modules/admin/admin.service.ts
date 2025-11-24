@@ -408,11 +408,7 @@ export class AdminService {
       throw new NotFoundException("Admin not found");
     }
 
-    return response({
-      message: "Admin found successfully",
-      data: admin,
-      statusCode: 200,
-    });
+    return admin;
   }
 
   /**
