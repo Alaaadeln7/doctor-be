@@ -1,26 +1,32 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsNumber, IsString, Min, MinLength, ValidateNested } from 'class-validator';
-import { Type } from 'class-transformer';
+import { ApiProperty } from "@nestjs/swagger";
+import {
+  IsNumber,
+  IsString,
+  Min,
+  MinLength,
+  ValidateNested,
+} from "class-validator";
+import { Type } from "class-transformer";
 
 class MultiLangString {
-  @ApiProperty({ example: 'plan' })
+  @ApiProperty({ example: "plan" })
   @IsString()
   @MinLength(3)
   en: string;
 
-  @ApiProperty({ example: 'خطة' })
+  @ApiProperty({ example: "خطة" })
   @IsString()
   @MinLength(3)
   ar: string;
 }
 
 class MultiLangText {
-  @ApiProperty({ example: 'plan description' })
+  @ApiProperty({ example: "plan description" })
   @IsString()
   @MinLength(10)
   en: string;
 
-  @ApiProperty({ example: 'وصف الخطة' })
+  @ApiProperty({ example: "وصف الخطة" })
   @IsString()
   @MinLength(10)
   ar: string;
@@ -55,8 +61,7 @@ export class addPlanDto {
   price: MultiLangPrice;
 }
 
-
-export class updatePlanDto{
+export class updatePlanDto {
   @ApiProperty({ type: MultiLangString })
   @ValidateNested()
   @Type(() => MultiLangString)
