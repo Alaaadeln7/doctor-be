@@ -11,6 +11,8 @@ import { RateEntity } from "../shared/entities/rates.entity";
 import { RequestEntity } from "../shared/entities/requests.entity";
 import { ReservationEntity } from "../shared/entities/reservations.entity";
 import { WorkingHoursEntity } from "../shared/entities/workinHours.entity";
+import { GovernorateEntity } from "../shared/entities/governorate.entity";
+import { CityEntity } from "../shared/entities/city.entity";
 
 @Module({
   imports: [
@@ -37,6 +39,8 @@ import { WorkingHoursEntity } from "../shared/entities/workinHours.entity";
             ReservationEntity,
             WorkingHoursEntity,
             CredentialEntity,
+            GovernorateEntity,
+            CityEntity,
           ],
           synchronize: true,
           logging: isDevelopment,

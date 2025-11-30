@@ -9,10 +9,18 @@ import { CategoryEntity } from "../../shared/entities/categoris.entity";
 import { CategoryService } from "../category/category.service";
 import { LocationService } from "../location/location.service";
 import { MailModule } from "../../mail/mail.module";
+import { GovernorateEntity } from "../../shared/entities/governorate.entity";
+import { CityEntity } from "../../shared/entities/city.entity";
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([AdminEntity, DoctorEntity, CategoryEntity]),
+    TypeOrmModule.forFeature([
+      AdminEntity,
+      DoctorEntity,
+      CategoryEntity,
+      GovernorateEntity,
+      CityEntity,
+    ]),
     MailModule,
   ],
   providers: [CommonService, OtpUtilService, CategoryService, LocationService],
