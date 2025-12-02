@@ -62,35 +62,102 @@ export class CategoryService {
   async getAllCategories(
     page: number,
     limit: number,
-    localeCode?: string
+    localeCode?: string,
+    title?: string,
+    id?: string
   ): Promise<Pagination<any>> {
     if (!localeCode) {
       const queryBuilder = this.categoryRepo
         .createQueryBuilder("category")
         .orderBy("category.id", "ASC")
         .select(["category.id", "category.title", "category.description"]);
+
+      // Apply filters if provided
+      if (id) {
+        const numericId = parseInt(id, 10);
+        console.log("Filtering by ID:", numericId, "Type:", typeof numericId);
+        if (!isNaN(numericId)) {
+          queryBuilder.andWhere("category.id = :id", { id: numericId });
+        }
+      }
+      if (title) {
+        queryBuilder.andWhere(
+          "(category.title->>'en' ILIKE :title OR category.title->>'ar' ILIKE :title)",
+          { title: `%${title}%` }
+        );
+      }
+
+      // Debug: Log the SQL query
+      console.log("SQL Query:", queryBuilder.getSql());
+      console.log("Parameters:", queryBuilder.getParameters());
+
       return paginate<CategoryEntity>(queryBuilder, {
         page,
         limit,
         route: "category",
       });
     } else {
-      const queryBuilder = this.categoryRepo
-        .createQueryBuilder("category")
-        .select([
-          "category.id AS id",
-          `category.title ->> :localeCode AS title`,
-          `category.description ->> :localeCode AS description`,
-        ])
-        .setParameters({ localeCode });
+      // When localeCode is provided, use getRawMany approach
+      let query = this.categoryRepo.createQueryBuilder("category");
+
+      // Apply ID filter first
+      if (id) {
+        const numericId = parseInt(id, 10);
+        console.log("Filtering by ID (with locale):", numericId);
+        if (!isNaN(numericId)) {
+          query = query.where("category.id = :id", { id: numericId });
+        }
+      }
+
+      // Apply title filter
+      if (title) {
+        const condition = `category.title->>'${localeCode}' ILIKE :title`;
+        if (id) {
+          query = query.andWhere(condition, { title: `%${title}%` });
+        } else {
+          query = query.where(condition, { title: `%${title}%` });
+        }
+      }
+
+      // Add select after where clauses
+      query = query.select([
+        "category.id AS id",
+        `category.title->>'${localeCode}' AS title`,
+        `category.description->>'${localeCode}' AS description`,
+      ]);
+
+      // Debug: Log the SQL query
+      console.log("SQL Query (locale):", query.getSql());
+      console.log("Parameters (locale):", query.getParameters());
+
+      // Get total count with same filters
+      let countQuery = this.categoryRepo.createQueryBuilder("category");
+
+      if (id) {
+        const numericId = parseInt(id, 10);
+        if (!isNaN(numericId)) {
+          countQuery = countQuery.where("category.id = :id", { id: numericId });
+        }
+      }
+      if (title) {
+        const condition = `category.title->>'${localeCode}' ILIKE :title`;
+        if (id) {
+          countQuery = countQuery.andWhere(condition, { title: `%${title}%` });
+        } else {
+          countQuery = countQuery.where(condition, { title: `%${title}%` });
+        }
+      }
 
       const [rawData, count] = await Promise.all([
-        queryBuilder
+        query
           .offset((page - 1) * limit)
           .limit(limit)
           .getRawMany(),
-        this.categoryRepo.count(),
+        countQuery.getCount(),
       ]);
+
+      console.log("Raw data returned:", rawData);
+      console.log("Count:", count);
 
       const items = rawData.map((category) => ({
         id: category.id,

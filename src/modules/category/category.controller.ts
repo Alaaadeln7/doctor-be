@@ -74,14 +74,20 @@ export class CategoryController {
     description: "The language code (e.g., en, ar)",
     required: false,
   })
-  async getAllCategories(
-    @Query() query: { page: number; limit: number },
-    @Req() req: Request
+  @Get()
+  async getCategories(
+    @Query("page") page: string,
+    @Query("limit") limit: string,
+    @Query("localeCode") localeCode?: string,
+    @Query("title") title?: string,
+    @Query("id") id?: string
   ) {
     return this.categoryService.getAllCategories(
-      +query.page,
-      +query.limit,
-      req["localeCode"]
+      parseInt(page) || 1,
+      parseInt(limit) || 10,
+      localeCode,
+      title,
+      id
     );
   }
 
