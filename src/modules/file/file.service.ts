@@ -147,7 +147,6 @@ export class FileService {
     if (!replacedFiles || replacedFiles.length === 0) {
       throw new BadRequestException(["File upload failed, please try again"]);
     }
-    // Build new auth object, keeping old files if not updated
     const newAuth = {
       card: filesToUpdate["card"]
         ? replacedFiles.find((f) => f.public_id && f.public_id.includes("card"))
