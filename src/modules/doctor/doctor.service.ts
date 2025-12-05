@@ -189,14 +189,14 @@ export class DoctorService {
     data: DoctorUpdateRawDataDto,
     doctorId: number
   ): Promise<DoctorResponseType> {
-    const { email, phone, fullName, address, clinc } = data;
+    const { email, phone, fullName, address, clinic } = data;
 
     const doctor = await this.doctorRepo.findOne({ where: { id: doctorId } });
     if (!doctor) {
       throw new NotFoundException("Doctor not found!");
     }
 
-    const existingImgs = doctor.clinc?.imgs || [];
+    const existingImgs = doctor.clinic?.imgs || [];
     let isEmailChanged = false;
 
     const updates: Partial<typeof doctor> = {};
@@ -223,9 +223,9 @@ export class DoctorService {
       updates.address = address;
     }
 
-    if (clinc && JSON.stringify(clinc) !== JSON.stringify(doctor.clinc)) {
-      updates.clinc = {
-        ...clinc,
+    if (clinic && JSON.stringify(clinic) !== JSON.stringify(doctor.clinic)) {
+      updates.clinic = {
+        ...clinic,
         imgs: existingImgs,
       };
     }
@@ -460,19 +460,19 @@ export class DoctorService {
     const doctor = await this.doctorRepo.findOne({ where: { id: doctorId } });
     if (!doctor) throw new NotFoundException("Cannot found doctor account.");
 
-    const { clinc, workingHours } = data;
+    const { clinic, workingHours } = data;
 
     return await this.doctorRepo.manager.transaction(async (manager) => {
-      doctor.clinc = {
-        name: clinc.name || doctor.clinc.name,
-        description: clinc.description || doctor.clinc.description,
-        address: clinc.address || doctor.clinc.address,
-        phone: clinc.phone || doctor.clinc.phone,
-        whats: clinc.whats || doctor.clinc.whats,
-        landingPhone: clinc.landingPhone || doctor.clinc.landingPhone,
-        price: clinc.price || doctor.clinc.price,
-        rePrice: clinc.rePrice || doctor.clinc.rePrice,
-        imgs: doctor.clinc.imgs,
+      doctor.clinic = {
+        name: clinic.name || doctor.clinic.name,
+        description: clinic.description || doctor.clinic.description,
+        address: clinic.address || doctor.clinic.address,
+        phone: clinic.phone || doctor.clinic.phone,
+        whats: clinic.whats || doctor.clinic.whats,
+        landingPhone: clinic.landingPhone || doctor.clinic.landingPhone,
+        price: clinic.price || doctor.clinic.price,
+        rePrice: clinic.rePrice || doctor.clinic.rePrice,
+        imgs: doctor.clinic.imgs,
       };
 
       const savedDoctor = await manager.save(doctor);
@@ -523,10 +523,10 @@ export class DoctorService {
     if (queryObj.price) {
       const { from, to } = queryObj.price;
       if (from !== undefined) {
-        qb.andWhere("(doctor.clinc ->> 'price')::numeric >= :from", { from });
+        qb.andWhere("(doctor.clinic ->> 'price')::numeric >= :from", { from });
       }
       if (to !== undefined) {
-        qb.andWhere("(doctor.clinc ->> 'price')::numeric <= :to", { to });
+        qb.andWhere("(doctor.clinic ->> 'price')::numeric <= :to", { to });
       }
     }
 

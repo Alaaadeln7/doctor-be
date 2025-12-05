@@ -26,19 +26,19 @@ import {
   LoginDoctorDto,
   orderKeyEnums,
   updatePasswordDto,
-} from "../..//shared/dtos/doctor.dto";
+} from "../../shared/dtos/doctor.dto";
 import { DoctorService } from "./doctor.service";
-import { Public } from "../..//common/decorators/public.decorator";
-import { DoctorResponseType } from "../..//shared/type/doctor.type";
+import { Public } from "../../common/decorators/public.decorator";
+import { DoctorResponseType } from "../../shared/type/doctor.type";
 import {
   ApiBearerAuth,
   ApiExcludeEndpoint,
   ApiParam,
   ApiQuery,
 } from "@nestjs/swagger";
-import { JwtUtilService } from "../..//common/utils/jwt.utils";
+import { JwtUtilService } from "../../common/utils/jwt.utils";
 import type { Request, Response } from "express";
-import { DoctorEntity, FileClass } from "../..//shared/entities/doctors.entity";
+import { DoctorEntity, FileClass } from "../../shared/entities/doctors.entity";
 
 @Controller("doctor")
 export class DoctorController {
@@ -75,7 +75,7 @@ export class DoctorController {
     return this.doctorService.doctorLogin(data);
   }
 
-  @Post("/clinc-and-working-hours")
+  @Post("/clinic-and-working-hours")
   @ApiBearerAuth("access-token")
   async addClincAndWorkingHours(
     @Body() data: ClincAndWorkingDaysDto,

@@ -14,19 +14,8 @@ import { PlanEntity } from "./plans.entity";
 import { RequestEntity } from "./requests.entity";
 import { WorkingHoursEntity } from "./workinHours.entity";
 import { AppointmentEntity } from "./appointments.entity";
-import { IsNotEmpty, IsString } from "class-validator";
 import { CredentialEntity } from "./credentials.entity";
 import { CategoryEntity } from "./categoris.entity";
-
-class Localization {
-  @IsString()
-  @IsNotEmpty()
-  en: string;
-
-  @IsString()
-  @IsNotEmpty()
-  ar: string;
-}
 
 export interface FileClass {
   public_id: string;
@@ -78,9 +67,9 @@ export class DoctorEntity {
   }[];
 
   @Column({ type: "jsonb", nullable: true })
-  clinc: {
-    name: Localization;
-    description: Localization;
+  clinic: {
+    name: string;
+    description: string;
     phone?: string;
     whats?: string;
     landingPhone?: string;
@@ -88,8 +77,8 @@ export class DoctorEntity {
     rePrice?: number;
     paymentWay?: "cash" | "vesa" | "bucket";
     address: {
-      link: Localization;
-      description?: Localization;
+      link: string;
+      description?: string;
     };
     imgs?: FileClass[];
   };

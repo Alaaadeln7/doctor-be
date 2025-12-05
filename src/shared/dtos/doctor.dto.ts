@@ -2,11 +2,9 @@ import {
   IsEmail,
   IsEnum,
   IsInt,
-  isNotEmpty,
   IsNotEmpty,
   IsNumber,
   IsOptional,
-  isString,
   IsString,
   Matches,
   Min,
@@ -14,7 +12,6 @@ import {
   ValidateNested,
 } from "class-validator";
 import { Type } from "class-transformer";
-import { CredentialEntity } from "../entities/credentials.entity";
 import { ApiProperty } from "@nestjs/swagger";
 import { Binary } from "typeorm";
 import { AddWoringHourDto } from "./working-hours.dto";
@@ -65,49 +62,44 @@ class AddressDto {
   center: string;
 }
 
-type Localization = {
-  en: string;
-  ar: string;
-};
-
 class ClincAddressDto {
   @ApiProperty({
     description: "Clinic location link in multiple languages",
-    example: { en: "https://maps.example.com", ar: "https://خريطة.مثال.كوم" },
+    example: "https://maps.example.com",
     required: true,
-    type: Object,
+    type: String,
   })
   @IsNotEmpty()
-  link: Localization;
+  link: string;
 
   @ApiProperty({
     description: "Clinic address description in multiple languages",
-    example: { en: "Floor 2, Building 5", ar: "الطابق الثاني، مبنى 5" },
+    example: "Floor 2, Building 5",
     required: true,
-    type: Object,
+    type: String,
   })
   @IsNotEmpty()
-  description: Localization;
+  description: string;
 }
 
 class ClincDto {
   @ApiProperty({
     description: "Clinic name in multiple languages",
-    example: { en: "Family Clinic", ar: "عيادة الأسرة" },
+    example: "Family Clinic",
     required: true,
-    type: Object,
+    type: String,
   })
   @IsNotEmpty()
-  name: Localization;
+  name: string;
 
   @ApiProperty({
     description: "Clinic description in multiple languages",
-    example: { en: "We care about your health", ar: "نحن نهتم بصحتك" },
+    example: "We care about your health",
     required: true,
-    type: Object,
+    type: String,
   })
   @IsNotEmpty()
-  description: Localization;
+  description: string;
 
   @ApiProperty({
     description: "Clinic address including link and description",
@@ -281,7 +273,7 @@ export class DoctorUpdateRawDataDto {
   })
   @ValidateNested()
   @Type(() => ClincDto)
-  clinc: ClincDto;
+  clinic: ClincDto;
 }
 
 export class doctorProfileResetPasswordDto {
@@ -424,21 +416,21 @@ export enum PaymentWay {
 class ClincForWorkingHourDto {
   @ApiProperty({
     description: "Clinic name in multiple languages",
-    example: { en: "Family Clinic", ar: "عيادة الأسرة" },
+    example: "Family Clinic",
     required: true,
-    type: Object,
+    type: String,
   })
   @IsNotEmpty()
-  name: Localization;
+  name: string;
 
   @ApiProperty({
     description: "Clinic description in multiple languages",
-    example: { en: "We care about your health", ar: "نحن نهتم بصحتك" },
+    example: "We care about your health",
     required: true,
-    type: Object,
+    type: String,
   })
   @IsNotEmpty()
-  description: Localization;
+  description: string;
 
   @ApiProperty({
     description: "Clinic address including link and description",
@@ -509,12 +501,12 @@ class ClincForWorkingHourDto {
 
 export class ClincAndWorkingDaysDto {
   @ApiProperty({
-    name: "clinc",
+    name: "clinic",
     type: ClincForWorkingHourDto,
   })
   @ValidateNested()
   @Type(() => ClincForWorkingHourDto)
-  clinc: ClincForWorkingHourDto;
+  clinic: ClincForWorkingHourDto;
 
   @ApiProperty({
     name: "workingHours",

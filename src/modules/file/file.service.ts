@@ -32,9 +32,9 @@ export class FileService {
     const doctor = await this.doctorRepo.findOneBy({ id: +doctorId });
     if (!doctor) throw new NotFoundException("Doctor profile not found");
 
-    // Ensure clinc and imgs are initialized
-    doctor.clinc = doctor.clinc || {};
-    doctor.clinc.imgs = doctor.clinc.imgs || [];
+    // Ensure clinic and imgs are initialized
+    doctor.clinic = doctor.clinic || {};
+    doctor.clinic.imgs = doctor.clinic.imgs || [];
 
     // Must keep at least one file or upload new ones
     if (
@@ -48,25 +48,25 @@ export class FileService {
 
     // If no keepFiles, replace all existing files with new ones
     if ((!keepFiles || keepFiles.length === 0) && files && files.length > 0) {
-      const oldPublicIds = doctor.clinc.imgs.map((img) => img.public_id);
+      const oldPublicIds = doctor.clinic.imgs.map((img) => img.public_id);
       const replacedFiles = await this.storageService.replaceFiles(
         oldPublicIds,
-        "doctors/clinc",
+        "doctors/clinic",
         files
       );
       if (!replacedFiles || replacedFiles.length === 0)
         throw new BadRequestException("Files upload failed, please try again");
-      doctor.clinc.imgs = replacedFiles;
+      doctor.clinic.imgs = replacedFiles;
     } else {
       // Delete files not in keepFiles
-      const filesToDelete = doctor.clinc.imgs.filter(
+      const filesToDelete = doctor.clinic.imgs.filter(
         (img) => !keepFiles.some((file) => file.public_id === img.public_id)
       );
       const publicIdsToDelete = filesToDelete.map((file) => file.public_id);
       if (publicIdsToDelete.length > 0) {
         const deletedFiles = await this.storageService.destroyFiles(
           publicIdsToDelete,
-          "doctors/clinc"
+          "doctors/clinic"
         );
         if (!deletedFiles)
           throw new BadRequestException(
@@ -86,7 +86,7 @@ export class FileService {
       if (files && files.length > 0) {
         uploadedFiles = await this.storageService.uploadFiles(
           files,
-          "doctors/clinc"
+          "doctors/clinic"
         );
         if (!uploadedFiles || uploadedFiles.length === 0) {
           throw new BadRequestException(
@@ -102,14 +102,14 @@ export class FileService {
           (up) => !keepFiles.some((kf) => kf.public_id === up.public_id)
         ),
       ];
-      doctor.clinc.imgs = mergedImgs;
+      doctor.clinic.imgs = mergedImgs;
     }
 
     // Save doctor entity with updated imgs
     const savedDoctor = await this.doctorRepo.save(doctor);
     if (!savedDoctor)
-      throw new BadRequestException("Failed to save your profile clinc files");
-    return { files: doctor.clinc.imgs };
+      throw new BadRequestException("Failed to save your profile clinic files");
+    return { files: doctor.clinic.imgs };
   }
 
   /**
