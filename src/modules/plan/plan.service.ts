@@ -15,12 +15,13 @@ export class PlanService {
   ) {}
 
   addPlan(data: addPlanDto & { lsUpBy: number }): Promise<PlanEntity> {
-    const { title, description, price, lsUpBy } = data;
+    const { title, description, price, lsUpBy, type } = data;
     const addNewPlan = this.planRepo.create({
       title,
       description,
       price,
       lsUpBy,
+      type,
     });
     return this.planRepo.save(addNewPlan);
   }

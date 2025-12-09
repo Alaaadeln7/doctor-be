@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import {
+  IsEnum,
   IsNumber,
   IsString,
   Min,
@@ -44,6 +45,11 @@ class MultiLangPrice {
   ar: number;
 }
 
+export enum PlanType {
+  MONTHLY = "monthly",
+  YEARLY = "yearly",
+}
+
 export class addPlanDto {
   @ApiProperty({ type: MultiLangString })
   @ValidateNested()
@@ -54,6 +60,15 @@ export class addPlanDto {
   @ValidateNested()
   @Type(() => MultiLangText)
   description: MultiLangText;
+
+  @ApiProperty({
+    enum: PlanType,
+    enumName: "PlanType",
+    description: "Subscription plan type",
+    example: PlanType.MONTHLY,
+  })
+  @IsEnum(PlanType, { message: "Type must be either monthly or yearly" })
+  type: PlanType;
 
   @ApiProperty({ type: MultiLangPrice })
   @ValidateNested()

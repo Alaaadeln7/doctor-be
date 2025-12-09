@@ -232,7 +232,7 @@ export class AdminService {
 
     const otp = this.otpService.generateComplexOtp(6);
     admin.otp = otp;
-
+    await this.adminRepo.save(admin);
     try {
       await this.mailService.sendResetPasswordEmail(
         admin.name,
@@ -244,9 +244,9 @@ export class AdminService {
       console.error("Failed to send login email:", error);
     }
 
-    await this.adminRepo.save(admin);
-
-    return {};
+    return {
+      message: "Reset password request sent successfully",
+    };
   }
 
   /**

@@ -35,6 +35,9 @@ export class PlanEntity {
   @Column({ type: "int", nullable: false })
   lsUpBy: number;
 
+  @Column({ type: "varchar", nullable: true })
+  type: string;
+
   @CreateDateColumn()
   createdAt: Date;
 
