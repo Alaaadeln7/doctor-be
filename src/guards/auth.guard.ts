@@ -1,38 +1,28 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  Injectable,
-  UnauthorizedException,
-} from "@nestjs/common";
-import { Reflector } from "@nestjs/core";
-import type { Request } from "express";
-import { JwtUtilService } from "../common/utils/jwt.utils";
+import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
+import type { Request } from 'express';
+import { JwtUtilService } from '../common/utils/jwt.utils';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
     private readonly jwtService: JwtUtilService,
-    private readonly reflector: Reflector
+    private readonly reflector: Reflector,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const isPublic = this.reflector.get<boolean>(
-      "isPublic",
-      context.getHandler()
-    );
+    const isPublic = this.reflector.get<boolean>('isPublic', context.getHandler());
 
     if (isPublic) return true;
 
     const request = context.switchToHttp().getRequest<Request>();
     const authHeader = request.headers.authorization;
 
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      throw new UnauthorizedException(
-        "Authorization header is missing or invalid"
-      );
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      throw new UnauthorizedException('Authorization header is missing or invalid');
     }
 
-    const token = authHeader.split(" ")[1];
+    const token = authHeader.split(' ')[1];
 
     try {
       const decodedToken = await this.jwtService.verifyToken(token);
@@ -42,7 +32,7 @@ export class AuthGuard implements CanActivate {
 
       return true;
     } catch (error) {
-      throw new UnauthorizedException("Invalid or expired token");
+      throw new UnauthorizedException('Invalid or expired token');
     }
   }
 }

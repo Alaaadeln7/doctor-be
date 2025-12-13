@@ -1,24 +1,24 @@
-import { Module } from "@nestjs/common";
-import { ConfigModule } from "@nestjs/config";
-import { AdminModule } from "./modules/admin/admin.module";
-import envConfig from "./config/env.config";
-import { DbModule } from "./db/drs.db";
-import { PlanModule } from "./modules/plan/plan.module";
-import { CategoryModule } from "./modules/category/category.module";
-import { DoctorModule } from "./modules/doctor/doctor.module";
-import { CredentialModule } from "./modules/credential/credential.module";
-import { FileModule } from "./modules/file/file.module";
-import { CommonModule } from "./modules/common/common.module";
-import { LocationModule } from "./modules/location/location.module";
-import { WorkinHoursModule } from "./modules/workin-hours/workin-hours.module";
-import { MailModule } from "./mail/mail.module";
+import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { AdminModule } from './modules/admin/admin.module';
+import envConfig from './config/env.config';
+import { DbModule } from './db/drs.db';
+import { PlanModule } from './modules/plan/plan.module';
+import { CategoryModule } from './modules/category/category.module';
+import { DoctorModule } from './modules/doctor/doctor.module';
+import { CredentialModule } from './modules/credential/credential.module';
+import { FileModule } from './modules/file/file.module';
+import { CommonModule } from './modules/common/common.module';
+import { LocationModule } from './modules/location/location.module';
+import { WorkinHoursModule } from './modules/workin-hours/workin-hours.module';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       load: [envConfig],
-      envFilePath: ".env",
+      envFilePath: '.env',
     }),
     MailModule,
     DbModule,

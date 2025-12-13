@@ -1,11 +1,11 @@
-import { Module } from "@nestjs/common";
-import { PlanController } from "./plan.controller";
-import { PlanService } from "./plan.service";
-import { APP_GUARD } from "@nestjs/core";
-import { AuthGuard } from "../..//guards/auth.guard";
-import { TypeOrmModule } from "@nestjs/typeorm";
-import { PlanEntity } from "../..//shared/entities/plans.entity";
-import { JwtUtilService } from "../..//common/utils/jwt.utils";
+import { Module } from '@nestjs/common';
+import { PlanController } from './plan.controller';
+import { PlanService } from './plan.service';
+import { APP_GUARD } from '@nestjs/core';
+import { AuthGuard } from '../..//guards/auth.guard';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { PlanEntity } from '../..//shared/entities/plans.entity';
+import { JwtUtilService } from '../..//common/utils/jwt.utils';
 
 @Module({
   imports: [TypeOrmModule.forFeature([PlanEntity])],

@@ -11,53 +11,47 @@ import {
   Query,
   UseInterceptors,
   Req,
-} from "@nestjs/common";
-import {
-  addCategoryDto,
-  updateCategoryDto,
-} from "../../shared/dtos/category.dto";
-import { ApiBearerAuth, ApiHeader, ApiParam, ApiQuery } from "@nestjs/swagger";
-import { CategoryEntity } from "../../shared/entities/categoris.entity";
-import { Pagination } from "nestjs-typeorm-paginate";
-import { Public } from "../../common/decorators/public.decorator";
-import LocalizationInterceptor from "../../common/interceptors/localization.interceptor";
-import { CategoryService } from "./category.service";
+} from '@nestjs/common';
+import { addCategoryDto, updateCategoryDto } from '../../shared/dtos/category.dto';
+import { ApiBearerAuth, ApiHeader, ApiParam, ApiQuery } from '@nestjs/swagger';
+import { CategoryEntity } from '../../shared/entities/categoris.entity';
+import { Pagination } from 'nestjs-typeorm-paginate';
+import { Public } from '../../common/decorators/public.decorator';
+import LocalizationInterceptor from '../../common/interceptors/localization.interceptor';
+import { CategoryService } from './category.service';
 
-@Controller("category")
+@Controller('category')
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
   @Post()
-  @ApiBearerAuth("access-token")
-  async addCategory(
-    @Body() data: addCategoryDto,
-    @Req() req: Request
-  ): Promise<CategoryEntity> {
-    return this.categoryService.addCategory(data, req["user"]?.id);
+  @ApiBearerAuth('access-token')
+  async addCategory(@Body() data: addCategoryDto, @Req() req: Request): Promise<CategoryEntity> {
+    return this.categoryService.addCategory(data, req['user']?.id);
   }
 
-  @Put(":id")
-  @ApiBearerAuth("access-token")
+  @Put(':id')
+  @ApiBearerAuth('access-token')
   @HttpCode(200)
-  @ApiParam({ name: "id", required: true, type: Number })
+  @ApiParam({ name: 'id', required: true, type: Number })
   async updateCategory(
-    @Param("id") id: number,
+    @Param('id') id: number,
     @Body() data: updateCategoryDto,
-    @Req() req: Request
+    @Req() req: Request,
   ): Promise<CategoryEntity> {
-    return this.categoryService.updateCategory(data, +id, req["user"]?.id);
+    return this.categoryService.updateCategory(data, +id, req['user']?.id);
   }
 
-  @ApiParam({ name: "id", required: true, type: Number })
-  @Delete(":id")
-  @ApiBearerAuth("access-token")
+  @ApiParam({ name: 'id', required: true, type: Number })
+  @Delete(':id')
+  @ApiBearerAuth('access-token')
   @HttpCode(200)
-  async deleteCategory(@Param("id") id: number): Promise<CategoryEntity> {
+  async deleteCategory(@Param('id') id: number): Promise<CategoryEntity> {
     return this.categoryService.deleteCategory(+id);
   }
 
   @Delete()
-  @ApiBearerAuth("access-token")
+  @ApiBearerAuth('access-token')
   @HttpCode(200)
   async deleteAllCategories(): Promise<void> {
     return this.categoryService.deleteAllCategories();
@@ -67,43 +61,40 @@ export class CategoryController {
   @Get()
   @UseInterceptors(LocalizationInterceptor)
   @HttpCode(200)
-  @ApiQuery({ name: "page", required: true, type: Number })
-  @ApiQuery({ name: "limit", required: true, type: Number })
+  @ApiQuery({ name: 'page', required: true, type: Number })
+  @ApiQuery({ name: 'limit', required: true, type: Number })
   @ApiHeader({
-    name: "locale-code",
-    description: "The language code (e.g., en, ar)",
+    name: 'locale-code',
+    description: 'The language code (e.g., en, ar)',
     required: false,
   })
   @Get()
   async getCategories(
-    @Query("page") page: string,
-    @Query("limit") limit: string,
-    @Query("localeCode") localeCode?: string,
-    @Query("title") title?: string,
-    @Query("id") id?: string
+    @Query('page') page: string,
+    @Query('limit') limit: string,
+    @Query('localeCode') localeCode?: string,
+    @Query('title') title?: string,
+    @Query('id') id?: string,
   ) {
     return this.categoryService.getAllCategories(
       parseInt(page) || 1,
       parseInt(limit) || 10,
       localeCode,
       title,
-      id
+      id,
     );
   }
 
   @Public()
-  @Get(":id")
+  @Get(':id')
   @UseInterceptors(LocalizationInterceptor)
   @HttpCode(200)
   @ApiHeader({
-    name: "locale-code",
-    description: "The language code (e.g., en, ar)",
+    name: 'locale-code',
+    description: 'The language code (e.g., en, ar)',
     required: false,
   })
-  async getOneCategory(
-    @Param("id") id: number,
-    @Req() req: Request
-  ): Promise<CategoryEntity> {
-    return this.categoryService.getOneCategory(+id, req["localeCode"]);
+  async getOneCategory(@Param('id') id: number, @Req() req: Request): Promise<CategoryEntity> {
+    return this.categoryService.getOneCategory(+id, req['localeCode']);
   }
 }

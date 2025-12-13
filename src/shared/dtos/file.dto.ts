@@ -1,14 +1,14 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty } from "class-validator";
-import { Binary } from "typeorm";
+import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty } from 'class-validator';
+import { Binary } from 'typeorm';
 
 // doctor
 export class DoctorProfileImgDto {
   @ApiProperty({
-    type: "string",
-    format: "binary",
-    name: "img",
-    description: "doctor profile image",
+    type: 'string',
+    format: 'binary',
+    name: 'img',
+    description: 'doctor profile image',
   })
   @IsNotEmpty()
   img: Binary;
@@ -16,19 +16,19 @@ export class DoctorProfileImgDto {
 
 export class DoctorProfileAuthFiles {
   @ApiProperty({
-    type: "string",
-    format: "binary",
-    name: "card",
-    description: "كارت النقابه",
+    type: 'string',
+    format: 'binary',
+    name: 'card',
+    description: 'كارت النقابه',
   })
   @IsNotEmpty()
   card: Binary;
 
   @ApiProperty({
-    type: "string",
-    format: "binary",
-    name: "fid",
-    description: "front face of identity",
+    type: 'string',
+    format: 'binary',
+    name: 'fid',
+    description: 'front face of identity',
   })
   @IsNotEmpty()
   fid: Binary;
@@ -36,19 +36,19 @@ export class DoctorProfileAuthFiles {
 
 export class DoctorProfileAuthUpdateFiles {
   @ApiProperty({
-    type: "string",
-    format: "binary",
-    name: "card",
-    description: "كارت النقابه",
+    type: 'string',
+    format: 'binary',
+    name: 'card',
+    description: 'كارت النقابه',
     required: false,
   })
   card?: Binary;
 
   @ApiProperty({
-    type: "string",
-    format: "binary",
-    name: "fid",
-    description: "front face of identity",
+    type: 'string',
+    format: 'binary',
+    name: 'fid',
+    description: 'front face of identity',
     required: false,
   })
   fid?: Binary;

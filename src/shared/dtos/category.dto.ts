@@ -1,26 +1,26 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsString, MinLength, ValidateNested } from "class-validator";
-import { Type } from "class-transformer";
+import { ApiProperty } from '@nestjs/swagger';
+import { IsString, MinLength, ValidateNested } from 'class-validator';
+import { Type } from 'class-transformer';
 
 class MultiLangString {
-  @ApiProperty({ example: "category" })
+  @ApiProperty({ example: 'category' })
   @IsString()
   @MinLength(3)
   en: string;
 
-  @ApiProperty({ example: "تصنيف" })
+  @ApiProperty({ example: 'تصنيف' })
   @IsString()
   @MinLength(3)
   ar: string;
 }
 
 class MultiLangText {
-  @ApiProperty({ example: "category description" })
+  @ApiProperty({ example: 'category description' })
   @IsString()
   @MinLength(10)
   en: string;
 
-  @ApiProperty({ example: "وصف التصنيف" })
+  @ApiProperty({ example: 'وصف التصنيف' })
   @IsString()
   @MinLength(10)
   ar: string;

@@ -4,17 +4,17 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
-} from "typeorm";
+} from 'typeorm';
 
-@Entity("governorate")
+@Entity('governorate')
 export class GovernorateEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: "varchar", length: 100, nullable: false })
+  @Column({ type: 'varchar', length: 100, nullable: false })
   governorate_name_ar: string;
 
-  @Column({ type: "varchar", length: 100, nullable: false })
+  @Column({ type: 'varchar', length: 100, nullable: false })
   governorate_name_en: string;
 
   @CreateDateColumn()

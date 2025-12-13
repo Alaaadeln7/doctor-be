@@ -10,16 +10,16 @@ import {
   Min,
   MinLength,
   ValidateNested,
-} from "class-validator";
-import { Type } from "class-transformer";
-import { ApiProperty } from "@nestjs/swagger";
-import { Binary } from "typeorm";
-import { AddWoringHourDto } from "./working-hours.dto";
+} from 'class-validator';
+import { Type } from 'class-transformer';
+import { ApiProperty } from '@nestjs/swagger';
+import { Binary } from 'typeorm';
+import { AddWoringHourDto } from './working-hours.dto';
 
 class FullNameDto {
   @ApiProperty({
-    description: "First name of the doctor",
-    example: "Ahmed",
+    description: 'First name of the doctor',
+    example: 'Ahmed',
     required: true,
     type: String,
   })
@@ -29,8 +29,8 @@ class FullNameDto {
   fname: string;
 
   @ApiProperty({
-    description: "Last name of the doctor",
-    example: "Mohamed",
+    description: 'Last name of the doctor',
+    example: 'Mohamed',
     required: true,
     type: String,
   })
@@ -42,8 +42,8 @@ class FullNameDto {
 
 class AddressDto {
   @ApiProperty({
-    description: "Governorate",
-    example: "Cairo",
+    description: 'Governorate',
+    example: 'Cairo',
     required: true,
     type: String,
   })
@@ -52,8 +52,8 @@ class AddressDto {
   governorate: string;
 
   @ApiProperty({
-    description: "Center within the governorate",
-    example: "Nasr City",
+    description: 'Center within the governorate',
+    example: 'Nasr City',
     required: true,
     type: String,
   })
@@ -64,8 +64,8 @@ class AddressDto {
 
 class ClincAddressDto {
   @ApiProperty({
-    description: "Clinic location link in multiple languages",
-    example: "https://maps.example.com",
+    description: 'Clinic location link in multiple languages',
+    example: 'https://maps.example.com',
     required: true,
     type: String,
   })
@@ -73,8 +73,8 @@ class ClincAddressDto {
   link: string;
 
   @ApiProperty({
-    description: "Clinic address description in multiple languages",
-    example: "Floor 2, Building 5",
+    description: 'Clinic address description in multiple languages',
+    example: 'Floor 2, Building 5',
     required: true,
     type: String,
   })
@@ -84,8 +84,8 @@ class ClincAddressDto {
 
 class ClincDto {
   @ApiProperty({
-    description: "Clinic name in multiple languages",
-    example: "Family Clinic",
+    description: 'Clinic name in multiple languages',
+    example: 'Family Clinic',
     required: true,
     type: String,
   })
@@ -93,8 +93,8 @@ class ClincDto {
   name: string;
 
   @ApiProperty({
-    description: "Clinic description in multiple languages",
-    example: "We care about your health",
+    description: 'Clinic description in multiple languages',
+    example: 'We care about your health',
     required: true,
     type: String,
   })
@@ -102,7 +102,7 @@ class ClincDto {
   description: string;
 
   @ApiProperty({
-    description: "Clinic address including link and description",
+    description: 'Clinic address including link and description',
     required: true,
     type: () => ClincAddressDto,
   })
@@ -113,8 +113,8 @@ class ClincDto {
 
 export class AddDoctorDto {
   @ApiProperty({
-    description: "Doctor email address",
-    example: "doctor@example.com",
+    description: 'Doctor email address',
+    example: 'doctor@example.com',
     required: true,
     type: String,
   })
@@ -123,8 +123,8 @@ export class AddDoctorDto {
   email: string;
 
   @ApiProperty({
-    description: "Doctor phone number",
-    example: "01012345678",
+    description: 'Doctor phone number',
+    example: '01012345678',
     required: true,
     type: String,
   })
@@ -133,7 +133,7 @@ export class AddDoctorDto {
   phone: string;
 
   @ApiProperty({
-    description: "Doctor full name (first and last)",
+    description: 'Doctor full name (first and last)',
     required: true,
     type: () => FullNameDto,
   })
@@ -142,7 +142,7 @@ export class AddDoctorDto {
   fullName: FullNameDto;
 
   @ApiProperty({
-    description: "Doctor address including governorate and center",
+    description: 'Doctor address including governorate and center',
     required: true,
     type: () => AddressDto,
   })
@@ -151,21 +151,21 @@ export class AddDoctorDto {
   address: AddressDto;
 
   @ApiProperty({
-    description: "Doctor password (must be strong)",
-    example: "StrongP@ssword1",
+    description: 'Doctor password (must be strong)',
+    example: 'StrongP@ssword1',
     required: true,
     type: String,
   })
   @IsString()
   @MinLength(8)
   @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
-    message: "password too weak",
+    message: 'password too weak',
   })
   password: string;
 
   @ApiProperty({
-    name: "syndicateNo",
-    description: "syndicate membership no",
+    name: 'syndicateNo',
+    description: 'syndicate membership no',
     required: true,
     type: String,
   })
@@ -177,37 +177,37 @@ export class AddDoctorDto {
 export class DoctorFilesDto {
   @IsNotEmpty()
   @ApiProperty({
-    name: "card",
+    name: 'card',
     description: "this field refer to doctor's card",
-    type: "string",
-    format: "binary",
+    type: 'string',
+    format: 'binary',
   })
   card: Binary;
 
   @IsNotEmpty()
   @ApiProperty({
-    name: "fid",
-    description: "fid refer to front face of the national id",
-    type: "string",
-    format: "binary",
+    name: 'fid',
+    description: 'fid refer to front face of the national id',
+    type: 'string',
+    format: 'binary',
   })
   fid: Binary;
 
   @IsNotEmpty()
   @ApiProperty({
-    name: "sid",
-    description: "sid refer to back face of the national id",
-    type: "string",
-    format: "binary",
+    name: 'sid',
+    description: 'sid refer to back face of the national id',
+    type: 'string',
+    format: 'binary',
   })
   sid: Binary;
 }
 
 export class LoginDoctorDto {
   @ApiProperty({
-    name: "email",
-    description: "Email of the doctor",
-    example: "doctor@gmail.com",
+    name: 'email',
+    description: 'Email of the doctor',
+    example: 'doctor@gmail.com',
     required: true,
     type: String,
   })
@@ -216,9 +216,9 @@ export class LoginDoctorDto {
   email: string;
 
   @ApiProperty({
-    name: "password",
-    description: "Password of the doctor",
-    example: "StrongP@ssword1",
+    name: 'password',
+    description: 'Password of the doctor',
+    example: 'StrongP@ssword1',
     required: true,
     type: String,
   })
@@ -229,8 +229,8 @@ export class LoginDoctorDto {
 
 export class DoctorUpdateRawDataDto {
   @ApiProperty({
-    description: "Doctor email address",
-    example: "doctor@example.com",
+    description: 'Doctor email address',
+    example: 'doctor@example.com',
     required: true,
     type: String,
   })
@@ -239,8 +239,8 @@ export class DoctorUpdateRawDataDto {
   email: string;
 
   @ApiProperty({
-    description: "Doctor phone number",
-    example: "01012345678",
+    description: 'Doctor phone number',
+    example: '01012345678',
     required: true,
     type: String,
   })
@@ -249,7 +249,7 @@ export class DoctorUpdateRawDataDto {
   phone: string;
 
   @ApiProperty({
-    description: "Doctor full name (first and last)",
+    description: 'Doctor full name (first and last)',
     required: true,
     type: () => FullNameDto,
   })
@@ -258,7 +258,7 @@ export class DoctorUpdateRawDataDto {
   fullName: FullNameDto;
 
   @ApiProperty({
-    description: "Doctor address including governorate and center",
+    description: 'Doctor address including governorate and center',
     required: true,
     type: () => AddressDto,
   })
@@ -267,7 +267,7 @@ export class DoctorUpdateRawDataDto {
   address: AddressDto;
 
   @ApiProperty({
-    description: "Doctor clinic information",
+    description: 'Doctor clinic information',
     required: true,
     type: () => ClincDto,
   })
@@ -278,8 +278,8 @@ export class DoctorUpdateRawDataDto {
 
 export class doctorProfileResetPasswordDto {
   @ApiProperty({
-    description: "Doctor email address",
-    example: "doctor@example.com",
+    description: 'Doctor email address',
+    example: 'doctor@example.com',
     required: true,
     type: String,
   })
@@ -290,8 +290,8 @@ export class doctorProfileResetPasswordDto {
 
 export class doctorProfileResetPasswordDoDto {
   @ApiProperty({
-    description: "Doctor email address",
-    example: "doctor@example.com",
+    description: 'Doctor email address',
+    example: 'doctor@example.com',
     required: true,
     type: String,
   })
@@ -300,9 +300,9 @@ export class doctorProfileResetPasswordDoDto {
   email: string;
 
   @ApiProperty({
-    name: "otp",
-    description: "OTP code for password reset",
-    example: "123456",
+    name: 'otp',
+    description: 'OTP code for password reset',
+    example: '123456',
     required: true,
     type: String,
   })
@@ -311,24 +311,24 @@ export class doctorProfileResetPasswordDoDto {
   otp: string;
 
   @ApiProperty({
-    description: "Doctor password (must be strong)",
-    example: "StrongP@ssword1",
+    description: 'Doctor password (must be strong)',
+    example: 'StrongP@ssword1',
     required: true,
     type: String,
   })
   @IsString()
   @MinLength(8)
   @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
-    message: "password too weak",
+    message: 'password too weak',
   })
   password: string;
 }
 
 export class doctorProfileChooseCategoryDto {
   @ApiProperty({
-    name: "category id",
-    description: "choosed category id go here",
-    type: "number",
+    name: 'category id',
+    description: 'choosed category id go here',
+    type: 'number',
     required: true,
   })
   @IsNumber()
@@ -338,9 +338,9 @@ export class doctorProfileChooseCategoryDto {
 
 export class updatePasswordDto {
   @ApiProperty({
-    name: "old password",
-    description: "old passwor dgo here",
-    type: "string",
+    name: 'old password',
+    description: 'old passwor dgo here',
+    type: 'string',
     required: true,
   })
   @IsNotEmpty()
@@ -348,23 +348,23 @@ export class updatePasswordDto {
   oldPassword: string;
 
   @ApiProperty({
-    description: "Doctor password (must be strong)",
-    example: "StrongP@ssword1",
+    description: 'Doctor password (must be strong)',
+    example: 'StrongP@ssword1',
     required: true,
     type: String,
   })
   @IsString()
   @MinLength(8)
   @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
-    message: "password too weak",
+    message: 'password too weak',
   })
   password: string;
 }
 
 export class doctorProfleVerifeAccountEmailDto {
   @ApiProperty({
-    description: "Doctor email address",
-    example: "doctor@example.com",
+    description: 'Doctor email address',
+    example: 'doctor@example.com',
     required: true,
     type: String,
   })
@@ -373,8 +373,8 @@ export class doctorProfleVerifeAccountEmailDto {
   email: string;
 
   @ApiProperty({
-    name: "otp",
-    description: "otp go here",
+    name: 'otp',
+    description: 'otp go here',
     required: true,
     type: String,
   })
@@ -385,22 +385,22 @@ export class doctorProfleVerifeAccountEmailDto {
 
 export class DoctorProfileViewerDto {
   @ApiProperty({
-    name: "viewerId",
-    description: "viewerId go here",
+    name: 'viewerId',
+    description: 'viewerId go here',
     example: 2,
     required: false,
-    type: "number",
+    type: 'number',
   })
   @IsOptional()
   @IsNumber()
   viewerId: number;
 
   @ApiProperty({
-    name: "viewerIp",
-    description: "viewerIp go here",
+    name: 'viewerIp',
+    description: 'viewerIp go here',
     example: 2,
     required: false,
-    type: "string",
+    type: 'string',
   })
   @IsOptional()
   @IsString()
@@ -408,15 +408,15 @@ export class DoctorProfileViewerDto {
 }
 
 export enum PaymentWay {
-  CASH = "cash",
-  VESA = "vesa",
-  BUCKET = "bucket",
+  CASH = 'cash',
+  VESA = 'vesa',
+  BUCKET = 'bucket',
 }
 
 class ClincForWorkingHourDto {
   @ApiProperty({
-    description: "Clinic name in multiple languages",
-    example: "Family Clinic",
+    description: 'Clinic name in multiple languages',
+    example: 'Family Clinic',
     required: true,
     type: String,
   })
@@ -424,8 +424,8 @@ class ClincForWorkingHourDto {
   name: string;
 
   @ApiProperty({
-    description: "Clinic description in multiple languages",
-    example: "We care about your health",
+    description: 'Clinic description in multiple languages',
+    example: 'We care about your health',
     required: true,
     type: String,
   })
@@ -433,7 +433,7 @@ class ClincForWorkingHourDto {
   description: string;
 
   @ApiProperty({
-    description: "Clinic address including link and description",
+    description: 'Clinic address including link and description',
     required: true,
     type: () => ClincAddressDto,
   })
@@ -441,9 +441,9 @@ class ClincForWorkingHourDto {
   @Type(() => ClincAddressDto)
   address: ClincAddressDto;
   @ApiProperty({
-    name: "phone",
-    description: "normal phone number, starts with +20",
-    type: "string",
+    name: 'phone',
+    description: 'normal phone number, starts with +20',
+    type: 'string',
     required: true,
   })
   @IsString()
@@ -451,9 +451,9 @@ class ClincForWorkingHourDto {
   phone: string;
 
   @ApiProperty({
-    name: "whats",
-    description: "normal whats number",
-    type: "string",
+    name: 'whats',
+    description: 'normal whats number',
+    type: 'string',
     required: true,
   })
   @IsString()
@@ -461,9 +461,9 @@ class ClincForWorkingHourDto {
   whats: string;
 
   @ApiProperty({
-    name: "landing phone",
-    description: "normal landing phone number",
-    type: "string",
+    name: 'landing phone',
+    description: 'normal landing phone number',
+    type: 'string',
     required: true,
   })
   @IsString()
@@ -471,9 +471,9 @@ class ClincForWorkingHourDto {
   landingPhone: string;
 
   @ApiProperty({
-    name: "price",
-    description: "price",
-    type: "number",
+    name: 'price',
+    description: 'price',
+    type: 'number',
     required: true,
   })
   @IsNumber()
@@ -481,9 +481,9 @@ class ClincForWorkingHourDto {
   price: number;
 
   @ApiProperty({
-    name: "rePrice",
-    description: "re price",
-    type: "number",
+    name: 'rePrice',
+    description: 're price',
+    type: 'number',
     required: true,
   })
   @IsNumber()
@@ -492,7 +492,7 @@ class ClincForWorkingHourDto {
 
   @ApiProperty({
     enum: PaymentWay,
-    description: "Payment method",
+    description: 'Payment method',
     required: true,
   })
   @IsEnum(PaymentWay)
@@ -501,7 +501,7 @@ class ClincForWorkingHourDto {
 
 export class ClincAndWorkingDaysDto {
   @ApiProperty({
-    name: "clinic",
+    name: 'clinic',
     type: ClincForWorkingHourDto,
   })
   @ValidateNested()
@@ -509,7 +509,7 @@ export class ClincAndWorkingDaysDto {
   clinic: ClincForWorkingHourDto;
 
   @ApiProperty({
-    name: "workingHours",
+    name: 'workingHours',
     type: [AddWoringHourDto],
   })
   @ValidateNested({ each: true })
@@ -518,9 +518,9 @@ export class ClincAndWorkingDaysDto {
 }
 
 export enum orderKeyEnums {
-  RATING = "rating",
-  PRICE = "price",
-  VISITS = "views",
+  RATING = 'rating',
+  PRICE = 'price',
+  VISITS = 'views',
 }
 
 export class GetDoctorQueriesDto {
@@ -545,8 +545,8 @@ export class GetDoctorQueriesDto {
   orderKey?: orderKeyEnums;
 
   @IsOptional()
-  @IsEnum(["ASC", "DESC"], { message: "orderValue must be ASC or DESC" })
-  orderValue?: "ASC" | "DESC";
+  @IsEnum(['ASC', 'DESC'], { message: 'orderValue must be ASC or DESC' })
+  orderValue?: 'ASC' | 'DESC';
 
   @IsOptional()
   @IsString()

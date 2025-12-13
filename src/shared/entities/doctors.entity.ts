@@ -9,13 +9,13 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
-} from "typeorm";
-import { PlanEntity } from "./plans.entity";
-import { RequestEntity } from "./requests.entity";
-import { WorkingHoursEntity } from "./workinHours.entity";
-import { AppointmentEntity } from "./appointments.entity";
-import { CredentialEntity } from "./credentials.entity";
-import { CategoryEntity } from "./categoris.entity";
+} from 'typeorm';
+import { PlanEntity } from './plans.entity';
+import { RequestEntity } from './requests.entity';
+import { WorkingHoursEntity } from './workinHours.entity';
+import { AppointmentEntity } from './appointments.entity';
+import { CredentialEntity } from './credentials.entity';
+import { CategoryEntity } from './categoris.entity';
 
 export interface FileClass {
   public_id: string;
@@ -29,44 +29,47 @@ export class DoctorEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: "varchar", nullable: false, unique: true })
+  @Column({ type: 'varchar', nullable: false, unique: true })
   email: string;
 
-  @Column({ type: "varchar", nullable: false, unique: true })
+  @Column({ type: 'varchar', nullable: false, unique: true })
   phone: string;
 
-  @Column({ type: "boolean", default: false })
+  @Column({ type: 'boolean', default: false })
   isDeleted: boolean;
 
-  @Column({ type: "jsonb", nullable: true })
+  @Column({ type: 'jsonb', nullable: true })
   img: FileClass;
 
-  @Column({ type: "jsonb", nullable: false })
+  @Column({ type: 'jsonb', nullable: false })
   fullName: {
     fname: string;
     lname: string;
   };
 
-  @Column({ type: "jsonb", nullable: false })
+  @Column({ type: 'jsonb', nullable: false })
   address: {
     governorate: string;
     center: string;
   };
 
-  @Column({ type: "jsonb", nullable: true })
+  @Column({ type: 'jsonb', nullable: true })
   code?: {
     code: string;
     count: number;
   };
 
-  @Column({ type: "jsonb", nullable: true, default: () => "'[]'" })
+  @Column({ type: 'jsonb', nullable: true })
+  discountCode: string;
+
+  @Column({ type: 'jsonb', nullable: true, default: () => "'[]'" })
   views: {
     viewer: DoctorEntity | null;
     ip: string;
     date: Date;
   }[];
 
-  @Column({ type: "jsonb", nullable: true })
+  @Column({ type: 'jsonb', nullable: true })
   clinic: {
     name: string;
     description: string;
@@ -75,7 +78,7 @@ export class DoctorEntity {
     landingPhone?: string;
     price?: number;
     rePrice?: number;
-    paymentWay?: "cash" | "vesa" | "bucket";
+    paymentWay?: 'cash' | 'vesa' | 'bucket';
     address: {
       link: string;
       description?: string;
@@ -83,7 +86,7 @@ export class DoctorEntity {
     imgs?: FileClass[];
   };
 
-  @Column({ type: "jsonb", nullable: true })
+  @Column({ type: 'jsonb', nullable: true })
   auth: {
     card: FileClass;
     id: {
@@ -91,19 +94,19 @@ export class DoctorEntity {
     };
   };
 
-  @Column({ type: "varchar", nullable: false, default: "0" })
+  @Column({ type: 'varchar', nullable: false, default: '0' })
   syndicateNo: string;
 
-  @Column({ type: "boolean", default: false })
+  @Column({ type: 'boolean', default: false })
   isActive: boolean;
 
-  @Column({ type: "boolean", default: false })
+  @Column({ type: 'boolean', default: false })
   isVerified: boolean;
 
-  @Column({ type: "float", default: 0 })
+  @Column({ type: 'float', default: 0 })
   rating: number;
 
-  @Column({ type: "varchar", nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   otp: string;
 
   @CreateDateColumn()
@@ -112,7 +115,7 @@ export class DoctorEntity {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @Column({ type: "int", nullable: true })
+  @Column({ type: 'int', nullable: true })
   lsUpBy: number;
 
   @ManyToOne(() => PlanEntity, (plan) => plan.doctors)

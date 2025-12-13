@@ -12,7 +12,7 @@ import {
   Query,
   Req,
   Res,
-} from "@nestjs/common";
+} from '@nestjs/common';
 import {
   AddDoctorDto,
   ClincAndWorkingDaysDto,
@@ -26,42 +26,35 @@ import {
   LoginDoctorDto,
   orderKeyEnums,
   updatePasswordDto,
-} from "../../shared/dtos/doctor.dto";
-import { DoctorService } from "./doctor.service";
-import { Public } from "../../common/decorators/public.decorator";
-import { DoctorResponseType } from "../../shared/type/doctor.type";
-import {
-  ApiBearerAuth,
-  ApiExcludeEndpoint,
-  ApiParam,
-  ApiQuery,
-} from "@nestjs/swagger";
-import { JwtUtilService } from "../../common/utils/jwt.utils";
-import type { Request, Response } from "express";
-import { DoctorEntity, FileClass } from "../../shared/entities/doctors.entity";
+} from '../../shared/dtos/doctor.dto';
+import { DoctorService } from './doctor.service';
+import { Public } from '../../common/decorators/public.decorator';
+import { DoctorResponseType } from '../../shared/type/doctor.type';
+import { ApiBearerAuth, ApiExcludeEndpoint, ApiParam, ApiQuery } from '@nestjs/swagger';
+import { JwtUtilService } from '../../common/utils/jwt.utils';
+import type { Request, Response } from 'express';
+import { DoctorEntity, FileClass } from '../../shared/entities/doctors.entity';
 
-@Controller("doctor")
+@Controller('doctor')
 export class DoctorController {
   constructor(
     private readonly doctorService: DoctorService,
-    private readonly jwtService: JwtUtilService
+    private readonly jwtService: JwtUtilService,
   ) {}
 
-  @Post("/signup")
+  @Post('/signup')
   @Public()
   async doctorSignup(@Body() data: AddDoctorDto): Promise<DoctorResponseType> {
     return this.doctorService.doctorSignup(data);
   }
 
-  @Post("verify-signup")
+  @Post('verify-signup')
   @Public()
-  async doctorProfileVerifyAccountEmail(
-    @Body() data: doctorProfleVerifeAccountEmailDto
-  ) {
+  async doctorProfileVerifyAccountEmail(@Body() data: doctorProfleVerifeAccountEmailDto) {
     return this.doctorService.doctorProfileVerifyAccountEmail(data);
   }
 
-  @Post("/login")
+  @Post('/login')
   @Public()
   @HttpCode(200)
   async doctorLogin(@Body() data: LoginDoctorDto): Promise<{
@@ -75,52 +68,43 @@ export class DoctorController {
     return this.doctorService.doctorLogin(data);
   }
 
-  @Post("/clinic-and-working-hours")
-  @ApiBearerAuth("access-token")
-  async addClincAndWorkingHours(
-    @Body() data: ClincAndWorkingDaysDto,
-    @Req() req: Request
-  ) {
-    const { id } = req["user"];
+  @Post('/clinic-and-working-hours')
+  @ApiBearerAuth('access-token')
+  async addClincAndWorkingHours(@Body() data: ClincAndWorkingDaysDto, @Req() req: Request) {
+    const { id } = req['user'];
     return this.doctorService.clincAndWorkingDays(data, id);
   }
 
-  @Put("/update-my-profile")
-  @ApiBearerAuth("access-token")
+  @Put('/update-my-profile')
+  @ApiBearerAuth('access-token')
   async updateMyDoctorProfileRawData(
     @Body() data: DoctorUpdateRawDataDto,
-    @Req() req: Request
+    @Req() req: Request,
   ): Promise<DoctorResponseType> {
-    const { id } = req["user"];
+    const { id } = req['user'];
     return this.doctorService.updateMyDoctorProfileRawData(data, id);
   }
 
-  @Get("verify-update-email")
+  @Get('verify-update-email')
   @Public()
-  async verifyUpdatedEmail(
-    @Res() res: Response,
-    @Query("token") token: string
-  ) {
+  async verifyUpdatedEmail(@Res() res: Response, @Query('token') token: string) {
     const decoded = this.jwtService.verifyToken(token);
     if (!decoded || !decoded.email || !decoded.id) {
-      return res.status(400).send("Invalid credentials!!!");
+      return res.status(400).send('Invalid credentials!!!');
     }
-    return this.doctorService.verifyUpdatedEmail(
-      { email: decoded.email, id: +decoded.id },
-      res
-    );
+    return this.doctorService.verifyUpdatedEmail({ email: decoded.email, id: +decoded.id }, res);
   }
 
   @Public()
-  @Post("verify_doctor_email_after_update_otp_using")
+  @Post('verify_doctor_email_after_update_otp_using')
   @ApiExcludeEndpoint()
   async verifyDoctorEmailAfterUpdateOtp(
-    @Body("otp") otp: string,
-    @Query("token") token: string
+    @Body('otp') otp: string,
+    @Query('token') token: string,
   ): Promise<DoctorResponseType> {
     const decoded = this.jwtService.verifyToken(token);
     if (!decoded || !decoded.email || !decoded.id) {
-      throw new BadRequestException("Invalid credentials!!!");
+      throw new BadRequestException('Invalid credentials!!!');
     }
     return this.doctorService.verifyDoctorEmailAfterUpdateOtp({
       otp,
@@ -130,112 +114,89 @@ export class DoctorController {
   }
 
   @Public()
-  @Post("reset-password-request")
-  async doctorResetPasswordRequest(
-    @Body() data: doctorProfileResetPasswordDto
-  ) {
+  @Post('reset-password-request')
+  async doctorResetPasswordRequest(@Body() data: doctorProfileResetPasswordDto) {
     return this.doctorService.doctorResetPasswordRequest(data);
   }
 
   @Public()
-  @Post("reset-password")
+  @Post('reset-password')
   async doctorResetPassword(@Body() data: doctorProfileResetPasswordDoDto) {
     return this.doctorService.doctorResetPassword(data);
   }
 
-  @Put("choose-category")
+  @Put('choose-category')
   @HttpCode(200)
-  async chooseCategory(
-    @Body() data: doctorProfileChooseCategoryDto,
-    @Req() req: Request
-  ) {
-    const id = req["user"].id;
+  async chooseCategory(@Body() data: doctorProfileChooseCategoryDto, @Req() req: Request) {
+    const id = req['user'].id;
     return this.doctorService.doctorProfileChooseCategory(data, +id);
   }
 
-  @Patch("update-password")
-  async doctorProfileUpdatePassword(
-    @Body() data: updatePasswordDto,
-    @Req() req: Request
-  ) {
-    const { id } = req["user"];
+  @Patch('update-password')
+  async doctorProfileUpdatePassword(@Body() data: updatePasswordDto, @Req() req: Request) {
+    const { id } = req['user'];
     return this.doctorService.doctorProfileUpdatePassword(data, +id);
   }
 
-  @Patch(":id/view")
+  @Patch(':id/view')
   @HttpCode(204)
   @ApiParam({
-    name: "id",
-    description: "profile id",
+    name: 'id',
+    description: 'profile id',
     required: true,
     example: 1,
-    type: "number",
+    type: 'number',
   })
-  async doctorProfileView(
-    @Param("id") id: string,
-    @Body() data: DoctorProfileViewerDto
-  ) {
+  async doctorProfileView(@Param('id') id: string, @Body() data: DoctorProfileViewerDto) {
     return this.doctorService.doctorProfileView(+id, data);
   }
 
-  @Get("/my-data")
-  @ApiBearerAuth("access-token")
+  @Get('/my-data')
+  @ApiBearerAuth('access-token')
   async getMyData(@Req() req: Request): Promise<DoctorEntity> {
-    const { id } = req["user"];
+    const { id } = req['user'];
     return this.doctorService.getMyData(id);
   }
 
   @Get()
   @ApiQuery({
-    name: "page",
-    description: "pagination",
+    name: 'page',
+    description: 'pagination',
     required: false,
     example: 1,
   })
   @ApiQuery({
-    name: "limit",
-    description: "pagination",
+    name: 'limit',
+    description: 'pagination',
     required: false,
     example: 10,
   })
-  @ApiQuery({ name: "orderKey", required: false, enum: orderKeyEnums })
-  @ApiQuery({ name: "orderValue", required: false, enum: ["ASC", "DESC"] })
+  @ApiQuery({ name: 'orderKey', required: false, enum: orderKeyEnums })
+  @ApiQuery({ name: 'orderValue', required: false, enum: ['ASC', 'DESC'] })
   @Public()
   async getAllDoctors(@Query() queries: GetDoctorQueriesDto) {
-    const {
-      orderKey,
-      orderValue,
-      search,
-      best,
-      price,
-      governorate,
-      center,
-      page,
-      limit,
-    } = queries;
+    const { orderKey, orderValue, search, best, price, governorate, center, page, limit } = queries;
 
     const directDoctoFilters = {
       page: Number(page),
       limit: Number(limit),
     };
 
-    orderKey && (directDoctoFilters["orderKey"] = orderKey);
-    orderValue && (directDoctoFilters["orderValue"] = orderValue);
-    search && (directDoctoFilters["search"] = search);
-    price && (directDoctoFilters["price"] = price);
-    best && (directDoctoFilters["best"] = best);
-    governorate && (directDoctoFilters["governorate"] = governorate);
-    center && (directDoctoFilters["center"] = center);
+    orderKey && (directDoctoFilters['orderKey'] = orderKey);
+    orderValue && (directDoctoFilters['orderValue'] = orderValue);
+    search && (directDoctoFilters['search'] = search);
+    price && (directDoctoFilters['price'] = price);
+    best && (directDoctoFilters['best'] = best);
+    governorate && (directDoctoFilters['governorate'] = governorate);
+    center && (directDoctoFilters['center'] = center);
 
     return this.doctorService.getAllDoctors(directDoctoFilters);
   }
 
-  @Patch("/handle-block/:id")
-  @ApiParam({ name: "id", type: String })
-  @ApiBearerAuth("access-token")
-  async handleBlockDoctor(
-    @Param("id") id: string
-  ): Promise<{ isActive: boolean }> {
+  @Patch('/handle-block/:id')
+  @ApiParam({ name: 'id', type: String })
+  @ApiBearerAuth('access-token')
+  async handleBlockDoctor(@Param('id') id: string): Promise<{ isActive: boolean }> {
     const idNo = +id;
     return this.doctorService.handleBlockDoctor(idNo);
   }

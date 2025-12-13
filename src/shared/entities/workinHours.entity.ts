@@ -6,18 +6,18 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
-} from "typeorm";
-import { DoctorEntity } from "./doctors.entity";
+} from 'typeorm';
+import { DoctorEntity } from './doctors.entity';
 
 @Entity()
 export class WorkingHoursEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: "jsonb", nullable: false })
+  @Column({ type: 'jsonb', nullable: false })
   day: string;
 
-  @Column({ type: "jsonb", nullable: false })
+  @Column({ type: 'jsonb', nullable: false })
   time: {
     from: string;
     to: string;
@@ -30,6 +30,6 @@ export class WorkingHoursEntity {
   updatedAt: Date;
 
   @ManyToOne(() => DoctorEntity, (doctor) => doctor.workinHours)
-  @JoinColumn({ name: "doctorId" })
+  @JoinColumn({ name: 'doctorId' })
   doctor: DoctorEntity;
 }

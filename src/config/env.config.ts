@@ -1,10 +1,10 @@
-import { registerAs } from "@nestjs/config";
-import * as dotenv from "dotenv";
+import { registerAs } from '@nestjs/config';
+import * as dotenv from 'dotenv';
 
-dotenv.config({ path: ".env" });
+dotenv.config({ path: '.env' });
 
-export default registerAs("envConfig", () => {
-  const isProd = process.env.NODE_ENV === "production";
+export default registerAs('envConfig', () => {
+  const isProd = process.env.NODE_ENV === 'production';
 
   return {
     system: {
@@ -41,8 +41,7 @@ export default registerAs("envConfig", () => {
     },
 
     links: {
-      updateMyEmailRedirectionLink:
-        process.env.UPDATE_MY_EMAIL_REDIRECTION_LINK,
+      updateMyEmailRedirectionLink: process.env.UPDATE_MY_EMAIL_REDIRECTION_LINK,
     },
 
     cloudinary: {
