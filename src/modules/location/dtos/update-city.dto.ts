@@ -1,4 +1,4 @@
-import { IsString, MinLength, IsInt, IsPositive } from "class-validator";
+import { IsString, MinLength, IsInt, IsPositive } from 'class-validator';
 
 export class UpdateCityDto {
   @IsInt()

@@ -1,7 +1,7 @@
 /* eslint-disable */
 
-import { MailerService } from "@nestjs-modules/mailer";
-import { Injectable } from "@nestjs/common";
+import { MailerService } from '@nestjs-modules/mailer';
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class MailService {
@@ -15,7 +15,7 @@ export class MailService {
   }): Promise<void> {
     try {
       await this.mailerService.sendMail({
-        from: `"${process.env.EMAIL_FROM_NAME || "Your App"}" <${process.env.EMAIL_FROM_ADDRESS}>`,
+        from: `"${process.env.EMAIL_FROM_NAME || 'Your App'}" <${process.env.EMAIL_FROM_ADDRESS}>`,
         to: params.to,
         subject: params.subject,
         html: params.html,
@@ -34,7 +34,7 @@ export class MailService {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${title || "Email"}</title>
+    <title>${title || 'Email'}</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -118,12 +118,7 @@ export class MailService {
   }
 
   /** Send login email */
-  async sendLoginEmail(
-    name: string,
-    email: string,
-    otp: string,
-    otpLink: string
-  ): Promise<void> {
+  async sendLoginEmail(name: string, email: string, otp: string, otpLink: string): Promise<void> {
     const html = this.generateBaseTemplate(
       `
         <div class="header">
@@ -149,12 +144,12 @@ export class MailService {
             <p>&copy; ${new Date().getFullYear()} Your Company Name. All rights reserved.</p>
         </div>
     `,
-      "Login to Your Account"
+      'Login to Your Account',
     );
 
     return this.sendHtmlEmail({
       to: email,
-      subject: "Login to Your Account",
+      subject: 'Login to Your Account',
       html,
     });
   }
@@ -164,7 +159,7 @@ export class MailService {
     name: string,
     email: string,
     otp: string,
-    otpLink: string
+    otpLink: string,
   ): Promise<void> {
     const html = this.generateBaseTemplate(
       `
@@ -191,12 +186,12 @@ export class MailService {
             <p>&copy; ${new Date().getFullYear()} Your Company Name. All rights reserved.</p>
         </div>
     `,
-      "Reset Your Password"
+      'Reset Your Password',
     );
 
     return this.sendHtmlEmail({
       to: email,
-      subject: "Reset Your Password",
+      subject: 'Reset Your Password',
       html,
     });
   }
@@ -206,7 +201,7 @@ export class MailService {
     name: string,
     email: string,
     otp: string,
-    otpLink: string
+    otpLink: string,
   ): Promise<void> {
     const html = this.generateBaseTemplate(
       `
@@ -233,22 +228,18 @@ export class MailService {
             <p>&copy; ${new Date().getFullYear()} Your Company Name. All rights reserved.</p>
         </div>
     `,
-      "Admin Account Verification"
+      'Admin Account Verification',
     );
 
     return this.sendHtmlEmail({
       to: email,
-      subject: "Admin Account Verification",
+      subject: 'Admin Account Verification',
       html,
     });
   }
 
   /** Contact-us confirmation email */
-  async sendContactUsEmail(
-    name: string,
-    email: string,
-    message: string
-  ): Promise<void> {
+  async sendContactUsEmail(name: string, email: string, message: string): Promise<void> {
     const html = this.generateBaseTemplate(
       `
         <div class="header">
@@ -273,12 +264,12 @@ export class MailService {
             <p>&copy; ${new Date().getFullYear()} Your Company Name. All rights reserved.</p>
         </div>
     `,
-      "Message Received"
+      'Message Received',
     );
 
     return this.sendHtmlEmail({
       to: email,
-      subject: "Your Message Was Received",
+      subject: 'Your Message Was Received',
       html,
     });
   }
@@ -288,7 +279,7 @@ export class MailService {
     name: string,
     email: string,
     otp: string,
-    otpLink: string
+    otpLink: string,
   ): Promise<void> {
     const html = this.generateBaseTemplate(
       `
@@ -315,12 +306,12 @@ export class MailService {
             <p>&copy; ${new Date().getFullYear()} Your Company Name. All rights reserved.</p>
         </div>
     `,
-      "Doctor Account Verification"
+      'Doctor Account Verification',
     );
 
     return this.sendHtmlEmail({
       to: email,
-      subject: "Doctor Account Verification",
+      subject: 'Doctor Account Verification',
       html,
     });
   }
@@ -330,7 +321,7 @@ export class MailService {
     name: string,
     email: string,
     otp: string,
-    link: string
+    link: string,
   ): Promise<void> {
     const html = this.generateBaseTemplate(
       `
@@ -357,22 +348,18 @@ export class MailService {
             <p>&copy; ${new Date().getFullYear()} Your Company Name. All rights reserved.</p>
         </div>
     `,
-      "Confirm Email Update"
+      'Confirm Email Update',
     );
 
     return this.sendHtmlEmail({
       to: email,
-      subject: "Confirm Email Update",
+      subject: 'Confirm Email Update',
       html,
     });
   }
 
   /** Resend OTP code */
-  async sendResendCodeEmail(
-    name: string,
-    email: string,
-    otp: string
-  ): Promise<void> {
+  async sendResendCodeEmail(name: string, email: string, otp: string): Promise<void> {
     const html = this.generateBaseTemplate(
       `
         <div class="header">
@@ -397,12 +384,12 @@ export class MailService {
             <p>&copy; ${new Date().getFullYear()} Your Company Name. All rights reserved.</p>
         </div>
     `,
-      "Your Verification Code"
+      'Your Verification Code',
     );
 
     return this.sendHtmlEmail({
       to: email,
-      subject: "Your Verification Code",
+      subject: 'Your Verification Code',
       html,
     });
   }
@@ -411,7 +398,7 @@ export class MailService {
   async sendUpdateMyAdminDataEmail(
     name: string,
     email: string,
-    redirectLink: string
+    redirectLink: string,
   ): Promise<void> {
     const html = this.generateBaseTemplate(
       `
@@ -437,12 +424,12 @@ export class MailService {
             <p>&copy; ${new Date().getFullYear()} Your Company Name. All rights reserved.</p>
         </div>
     `,
-      "Admin Data Updated"
+      'Admin Data Updated',
     );
 
     return this.sendHtmlEmail({
       to: email,
-      subject: "Admin Data Updated",
+      subject: 'Admin Data Updated',
       html,
     });
   }
@@ -452,7 +439,7 @@ export class MailService {
     name: string,
     email: string,
     otp: string,
-    otpLink: string
+    otpLink: string,
   ): Promise<void> {
     const html = this.generateBaseTemplate(
       `
@@ -479,12 +466,12 @@ export class MailService {
             <p>&copy; ${new Date().getFullYear()} Your Company Name. All rights reserved.</p>
         </div>
     `,
-      "Reset Your Password"
+      'Reset Your Password',
     );
 
     return this.sendHtmlEmail({
       to: email,
-      subject: "Reset Your Password",
+      subject: 'Reset Your Password',
       html,
     });
   }

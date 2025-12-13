@@ -5,37 +5,37 @@ import {
   OneToMany,
   CreateDateColumn,
   UpdateDateColumn,
-} from "typeorm";
-import { DoctorEntity } from "./doctors.entity";
-import { RequestEntity } from "./requests.entity";
+} from 'typeorm';
+import { DoctorEntity } from './doctors.entity';
+import { RequestEntity } from './requests.entity';
 
 @Entity()
 export class PlanEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: "jsonb", nullable: false, unique: true })
+  @Column({ type: 'jsonb', nullable: false, unique: true })
   title: {
     en: string;
     ar: string;
   };
 
-  @Column({ type: "jsonb", nullable: false })
+  @Column({ type: 'jsonb', nullable: false })
   description: {
     en: string;
     ar: string;
   };
 
-  @Column({ type: "jsonb", nullable: false })
+  @Column({ type: 'jsonb', nullable: false })
   price: {
     en: number;
     ar: number;
   };
 
-  @Column({ type: "int", nullable: false })
+  @Column({ type: 'int', nullable: false })
   lsUpBy: number;
 
-  @Column({ type: "varchar", nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   type: string;
 
   @CreateDateColumn()

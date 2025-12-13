@@ -1,22 +1,18 @@
 /* eslint-disable */
 
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { StorageUtilService } from "../..//common/utils/storage.util";
-import { DoctorEntity } from "../..//shared/entities/doctors.entity";
-import { Repository } from "typeorm";
-import { FilesType } from "./file.controller";
-import { Express } from "express";
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { StorageUtilService } from '../..//common/utils/storage.util';
+import { DoctorEntity } from '../..//shared/entities/doctors.entity';
+import { Repository } from 'typeorm';
+import { FilesType } from './file.controller';
+import { Express } from 'express';
 @Injectable()
 export class FileService {
   constructor(
     private readonly storageService: StorageUtilService,
     @InjectRepository(DoctorEntity)
-    private readonly doctorRepo: Repository<DoctorEntity>
+    private readonly doctorRepo: Repository<DoctorEntity>,
   ) {}
 
   /**
@@ -26,23 +22,20 @@ export class FileService {
   async updateDoctorClincFiles(
     doctorId: number,
     files: Express.Multer.File[],
-    keepFiles: { public_id: string; url: string }[]
+    keepFiles: { public_id: string; url: string }[],
   ) {
     // Find doctor
     const doctor = await this.doctorRepo.findOneBy({ id: +doctorId });
-    if (!doctor) throw new NotFoundException("Doctor profile not found");
+    if (!doctor) throw new NotFoundException('Doctor profile not found');
 
     // Ensure clinic and imgs are initialized
     doctor.clinic = doctor.clinic || {};
     doctor.clinic.imgs = doctor.clinic.imgs || [];
 
     // Must keep at least one file or upload new ones
-    if (
-      (!keepFiles || keepFiles.length === 0) &&
-      (!files || files.length === 0)
-    ) {
+    if ((!keepFiles || keepFiles.length === 0) && (!files || files.length === 0)) {
       throw new BadRequestException(
-        "You must upload at least one file or provide old files to keep"
+        'You must upload at least one file or provide old files to keep',
       );
     }
 
@@ -51,64 +44,52 @@ export class FileService {
       const oldPublicIds = doctor.clinic.imgs.map((img) => img.public_id);
       const replacedFiles = await this.storageService.replaceFiles(
         oldPublicIds,
-        "doctors/clinic",
-        files
+        'doctors/clinic',
+        files,
       );
       if (!replacedFiles || replacedFiles.length === 0)
-        throw new BadRequestException("Files upload failed, please try again");
+        throw new BadRequestException('Files upload failed, please try again');
       doctor.clinic.imgs = replacedFiles;
     } else {
       // Delete files not in keepFiles
       const filesToDelete = doctor.clinic.imgs.filter(
-        (img) => !keepFiles.some((file) => file.public_id === img.public_id)
+        (img) => !keepFiles.some((file) => file.public_id === img.public_id),
       );
       const publicIdsToDelete = filesToDelete.map((file) => file.public_id);
       if (publicIdsToDelete.length > 0) {
         const deletedFiles = await this.storageService.destroyFiles(
           publicIdsToDelete,
-          "doctors/clinic"
+          'doctors/clinic',
         );
         if (!deletedFiles)
-          throw new BadRequestException(
-            "Failed to delete old files, please try again"
-          );
+          throw new BadRequestException('Failed to delete old files, please try again');
       }
 
       // Check total images before uploading new files (max 10)
       if (keepFiles.length + (files?.length || 0) > 10) {
-        throw new BadRequestException(
-          "You cannot have more than 10 clinic images"
-        );
+        throw new BadRequestException('You cannot have more than 10 clinic images');
       }
 
       // Upload new files if any
       let uploadedFiles: { public_id: string; url: string }[] = [];
       if (files && files.length > 0) {
-        uploadedFiles = await this.storageService.uploadFiles(
-          files,
-          "doctors/clinic"
-        );
+        uploadedFiles = await this.storageService.uploadFiles(files, 'doctors/clinic');
         if (!uploadedFiles || uploadedFiles.length === 0) {
-          throw new BadRequestException(
-            "Files upload failed, please try again"
-          );
+          throw new BadRequestException('Files upload failed, please try again');
         }
       }
 
       // Merge keepFiles and uploadedFiles, avoiding duplicates
       const mergedImgs = [
         ...keepFiles,
-        ...uploadedFiles.filter(
-          (up) => !keepFiles.some((kf) => kf.public_id === up.public_id)
-        ),
+        ...uploadedFiles.filter((up) => !keepFiles.some((kf) => kf.public_id === up.public_id)),
       ];
       doctor.clinic.imgs = mergedImgs;
     }
 
     // Save doctor entity with updated imgs
     const savedDoctor = await this.doctorRepo.save(doctor);
-    if (!savedDoctor)
-      throw new BadRequestException("Failed to save your profile clinic files");
+    if (!savedDoctor) throw new BadRequestException('Failed to save your profile clinic files');
     return { files: doctor.clinic.imgs };
   }
 
@@ -119,43 +100,39 @@ export class FileService {
   async updateDoctorAuthFiles(doctorId: number, files: FilesType) {
     const doctor = await this.doctorRepo.findOne({ where: { id: +doctorId } });
     if (!doctor) {
-      throw new NotFoundException("Doctor profile not found");
+      throw new NotFoundException('Doctor profile not found');
     }
     const doctorAuthFiles = doctor.auth || {};
     const filesToUpdate: { [key: string]: Express.Multer.File } = {};
     const publicIdsList: string[] = [];
     // Prepare files to update and collect old public_ids for replacement
     if (files.card?.length) {
-      filesToUpdate["card"] = files.card[0];
-      if (doctorAuthFiles.card?.public_id)
-        publicIdsList.push(doctorAuthFiles.card.public_id);
+      filesToUpdate['card'] = files.card[0];
+      if (doctorAuthFiles.card?.public_id) publicIdsList.push(doctorAuthFiles.card.public_id);
     }
     if (files.fid?.length) {
-      filesToUpdate["fid"] = files.fid[0];
-      if (doctorAuthFiles.id?.fid?.public_id)
-        publicIdsList.push(doctorAuthFiles.id.fid.public_id);
+      filesToUpdate['fid'] = files.fid[0];
+      if (doctorAuthFiles.id?.fid?.public_id) publicIdsList.push(doctorAuthFiles.id.fid.public_id);
     }
     if (Object.keys(filesToUpdate).length === 0) {
-      throw new BadRequestException("You must upload at least one file");
+      throw new BadRequestException('You must upload at least one file');
     }
     // Replace only the sent files
     const replacedFiles = await this.storageService.replaceFiles(
       publicIdsList,
-      "doctors/auth",
-      Object.values(filesToUpdate)
+      'doctors/auth',
+      Object.values(filesToUpdate),
     );
     if (!replacedFiles || replacedFiles.length === 0) {
-      throw new BadRequestException(["File upload failed, please try again"]);
+      throw new BadRequestException(['File upload failed, please try again']);
     }
     const newAuth = {
-      card: filesToUpdate["card"]
-        ? replacedFiles.find((f) => f.public_id && f.public_id.includes("card"))
+      card: filesToUpdate['card']
+        ? replacedFiles.find((f) => f.public_id && f.public_id.includes('card'))
         : doctorAuthFiles.card,
       id: {
-        fid: filesToUpdate["fid"]
-          ? replacedFiles.find(
-              (f) => f.public_id && f.public_id.includes("fid")
-            )
+        fid: filesToUpdate['fid']
+          ? replacedFiles.find((f) => f.public_id && f.public_id.includes('fid'))
           : doctorAuthFiles.id?.fid,
       },
     };
@@ -165,7 +142,7 @@ export class FileService {
     });
     if (!updateMyDoctorFiles || updateMyDoctorFiles.affected === 0) {
       throw new BadRequestException([
-        "Failed to update your profile files, please try again later",
+        'Failed to update your profile files, please try again later',
       ]);
     }
     return { files: newAuth };
@@ -177,46 +154,41 @@ export class FileService {
   async createDoctorAuthFiles(doctorId: number, files: FilesType) {
     const doctor = await this.doctorRepo.findOne({ where: { id: +doctorId } });
     if (!doctor) {
-      throw new NotFoundException("Doctor profile not found");
+      throw new NotFoundException('Doctor profile not found');
     }
     // All three files are required for first time
     if (!files.card?.length || !files.fid?.length) {
       throw new BadRequestException([
-        "You must upload all three files: card and identification front and back",
+        'You must upload all three files: card and identification front and back',
       ]);
     }
     const filesObjs = [files.card[0], files.fid[0]];
     // Upload all files
-    const uploadedFiles = await this.storageService.uploadFiles(
-      filesObjs,
-      "doctors/auth"
-    );
+    const uploadedFiles = await this.storageService.uploadFiles(filesObjs, 'doctors/auth');
     if (!uploadedFiles || uploadedFiles.length === 0) {
-      throw new BadRequestException(["File upload failed, please try again"]);
+      throw new BadRequestException(['File upload failed, please try again']);
     }
     // Build auth object from uploaded files
     const doctorFiles = {
       card:
-        uploadedFiles.find(
-          (file) => file.public_id && file.public_id.includes("card")
-        ) || doctor.auth?.card,
+        uploadedFiles.find((file) => file.public_id && file.public_id.includes('card')) ||
+        doctor.auth?.card,
       id: {
         fid:
-          uploadedFiles.find(
-            (file) => file.public_id && file.public_id.includes("fid")
-          ) || doctor.auth?.id?.fid,
+          uploadedFiles.find((file) => file.public_id && file.public_id.includes('fid')) ||
+          doctor.auth?.id?.fid,
       },
     };
     // Ensure all files exist
     if (!doctorFiles.card || !doctorFiles.id.fid) {
-      throw new BadRequestException("All auth files must be provided");
+      throw new BadRequestException('All auth files must be provided');
     }
 
     doctor.auth = doctorFiles;
     const updatedDoctor = await this.doctorRepo.save(doctor);
     if (!updatedDoctor) {
       throw new BadRequestException([
-        "Failed to update your profile files, please try again later",
+        'Failed to update your profile files, please try again later',
       ]);
     }
     return { files: doctorFiles };
@@ -227,29 +199,24 @@ export class FileService {
    * Replaces the old image with the new one.
    */
   async updateDoctorProfileImg(doctorId: number, file: Express.Multer.File) {
-    if (!doctorId) throw new BadRequestException("User not authenticated");
+    if (!doctorId) throw new BadRequestException('User not authenticated');
     const doctor = await this.doctorRepo.findOneBy({ id: doctorId });
-    if (!doctor) throw new NotFoundException("Doctor profile not found");
-    if (!file)
-      throw new BadRequestException("You must upload your profile img");
+    if (!doctor) throw new NotFoundException('Doctor profile not found');
+    if (!file) throw new BadRequestException('You must upload your profile img');
     const { img } = doctor;
     // Replace old image with new one
-    const replacedFiles = await this.storageService.replaceFiles(
-      [img?.public_id],
-      "doctors/img",
-      [file]
-    );
+    const replacedFiles = await this.storageService.replaceFiles([img?.public_id], 'doctors/img', [
+      file,
+    ]);
     if (!replacedFiles || !replacedFiles[0].public_id)
-      throw new BadRequestException("File upload failed, please try again");
+      throw new BadRequestException('File upload failed, please try again');
     doctor.img = {
       public_id: replacedFiles[0].public_id,
       url: replacedFiles[0].url,
     };
     const updatedDoctor = await this.doctorRepo.save(doctor);
     if (!updatedDoctor)
-      throw new BadRequestException(
-        "Failed to update your profile image, please try again later"
-      );
+      throw new BadRequestException('Failed to update your profile image, please try again later');
     return { img: doctor.img };
   }
 }

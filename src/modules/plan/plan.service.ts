@@ -1,17 +1,17 @@
 /* eslint-disable */
 
-import { Injectable, NotFoundException } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { paginate, Pagination } from "nestjs-typeorm-paginate";
-import { addPlanDto, updatePlanDto } from "../..//shared/dtos/plan.dto";
-import { PlanEntity } from "../..//shared/entities/plans.entity";
-import { Repository } from "typeorm";
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { paginate, Pagination } from 'nestjs-typeorm-paginate';
+import { addPlanDto, updatePlanDto } from '../..//shared/dtos/plan.dto';
+import { PlanEntity } from '../..//shared/entities/plans.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class PlanService {
   constructor(
     @InjectRepository(PlanEntity)
-    private readonly planRepo: Repository<PlanEntity>
+    private readonly planRepo: Repository<PlanEntity>,
   ) {}
 
   addPlan(data: addPlanDto & { lsUpBy: number }): Promise<PlanEntity> {
@@ -26,13 +26,10 @@ export class PlanService {
     return this.planRepo.save(addNewPlan);
   }
 
-  async updatePlan(
-    data: updatePlanDto & { lsUpBy: number },
-    id: number
-  ): Promise<PlanEntity> {
+  async updatePlan(data: updatePlanDto & { lsUpBy: number }, id: number): Promise<PlanEntity> {
     const plan = await this.planRepo.findOneBy({ id });
     if (!plan) {
-      throw new NotFoundException("Plan not found");
+      throw new NotFoundException('Plan not found');
     }
     const updated = this.planRepo.merge(plan, data);
     return this.planRepo.save(updated);
@@ -41,7 +38,7 @@ export class PlanService {
   async deletePlan(id: number): Promise<PlanEntity> {
     const plan = await this.planRepo.findOneBy({ id });
     if (!plan) {
-      throw new NotFoundException("Plan not found");
+      throw new NotFoundException('Plan not found');
     }
     return this.planRepo.remove(plan);
   }
@@ -56,37 +53,36 @@ export class PlanService {
     localeCode: string,
     title: string,
     price: string,
-    id: string
+    id: string,
   ): Promise<Pagination<any>> {
     // ------------------------------
     // CASE 1: No localeCode → return normal fields
     // ------------------------------
     if (!localeCode) {
       const plansQuery = this.planRepo
-        .createQueryBuilder("plan")
-        .select(["plan.id", "plan.title", "plan.description", "plan.price"])
-        .orderBy("plan.id", "ASC");
+        .createQueryBuilder('plan')
+        .select(['plan.id', 'plan.title', 'plan.description', 'plan.price'])
+        .orderBy('plan.id', 'ASC');
 
       if (id) {
-        plansQuery.andWhere("plan.id = :id", { id });
+        plansQuery.andWhere('plan.id = :id', { id });
       }
       if (title) {
         // Search in both en and ar fields
-        plansQuery.andWhere(
-          "(plan.title->>'en' ILIKE :title OR plan.title->>'ar' ILIKE :title)",
-          { title: `%${title}%` }
-        );
+        plansQuery.andWhere("(plan.title->>'en' ILIKE :title OR plan.title->>'ar' ILIKE :title)", {
+          title: `%${title}%`,
+        });
       }
       if (price) {
         // Search in both en and ar fields for price
         const numPrice = parseFloat(price);
         plansQuery.andWhere(
           "((plan.price->>'en')::numeric = :price OR (plan.price->>'ar')::numeric = :price)",
-          { price: numPrice }
+          { price: numPrice },
         );
       }
 
-      return paginate<PlanEntity>(plansQuery, { page, limit, route: "/plan" });
+      return paginate<PlanEntity>(plansQuery, { page, limit, route: '/plan' });
     }
 
     // ------------------------------
@@ -94,16 +90,16 @@ export class PlanService {
     // ------------------------------
 
     const queryBuilder = this.planRepo
-      .createQueryBuilder("plan")
-      .select("plan.id", "id")
-      .addSelect(`plan.title ->> :localeCode`, "title")
-      .addSelect(`plan.description ->> :localeCode`, "description")
-      .addSelect(`plan.price ->> :localeCode`, "price")
+      .createQueryBuilder('plan')
+      .select('plan.id', 'id')
+      .addSelect(`plan.title ->> :localeCode`, 'title')
+      .addSelect(`plan.description ->> :localeCode`, 'description')
+      .addSelect(`plan.price ->> :localeCode`, 'price')
       .setParameters({ localeCode });
 
     // Filters
     if (id) {
-      queryBuilder.andWhere("plan.id = :id", { id });
+      queryBuilder.andWhere('plan.id = :id', { id });
     }
     if (title) {
       queryBuilder.andWhere(`(plan.title ->> :localeCode) ILIKE :title`, {
@@ -121,12 +117,10 @@ export class PlanService {
     // ------------------------------
     // Count query (MUST match same filters)
     // ------------------------------
-    const countQuery = this.planRepo
-      .createQueryBuilder("plan")
-      .select("COUNT(*)", "count");
+    const countQuery = this.planRepo.createQueryBuilder('plan').select('COUNT(*)', 'count');
 
     if (id) {
-      countQuery.andWhere("plan.id = :id", { id });
+      countQuery.andWhere('plan.id = :id', { id });
     }
     if (title) {
       countQuery.andWhere(`(plan.title ->> :localeCode) ILIKE :title`, {
@@ -180,7 +174,7 @@ export class PlanService {
     if (!localeCode) {
       const plan = await this.planRepo.findOneBy({ id });
       if (!plan) {
-        throw new NotFoundException("Plan not found");
+        throw new NotFoundException('Plan not found');
       }
       return {
         id: plan.id,
@@ -190,19 +184,19 @@ export class PlanService {
       };
     }
     const plan = await this.planRepo
-      .createQueryBuilder("plan")
+      .createQueryBuilder('plan')
       .select([
-        "plan.id AS id",
+        'plan.id AS id',
         `plan.title ->> :localeCode AS title`,
         `plan.description ->> :localeCode AS description`,
         `plan.price ->> :localeCode AS price`,
       ])
-      .where("plan.id = :id", { id })
+      .where('plan.id = :id', { id })
       .setParameters({ localeCode })
       .getRawOne();
 
     if (!plan) {
-      throw new NotFoundException("Plan not found");
+      throw new NotFoundException('Plan not found');
     }
 
     return {
@@ -215,8 +209,8 @@ export class PlanService {
 
   async getTheBasicPlan(): Promise<PlanEntity | false> {
     const plan = await this.planRepo
-      .createQueryBuilder("plan")
-      .orderBy(`(plan.price ->> 'en')::numeric`, "ASC")
+      .createQueryBuilder('plan')
+      .orderBy(`(plan.price ->> 'en')::numeric`, 'ASC')
       .limit(1)
       .getOne();
     if (!plan) return false;

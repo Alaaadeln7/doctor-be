@@ -1,22 +1,22 @@
 /* eslint-disable */
 
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable, NotFoundException } from '@nestjs/common';
 
-import { InjectRepository } from "@nestjs/typeorm";
-import { GovernorateEntity } from "../../shared/entities/governorate.entity";
-import { Repository } from "typeorm";
-import { CreateGovernorateDto } from "./dtos/create.governorates.dto";
-import { UpdateGovernorateDto } from "./dtos/update.governorates.dto";
-import { CityEntity } from "../../shared/entities/city.entity";
-import { CreateCityDto } from "./dtos/create-city.dto";
-import { UpdateCityDto } from "./dtos/update-city.dto";
+import { InjectRepository } from '@nestjs/typeorm';
+import { GovernorateEntity } from '../../shared/entities/governorate.entity';
+import { Repository } from 'typeorm';
+import { CreateGovernorateDto } from './dtos/create.governorates.dto';
+import { UpdateGovernorateDto } from './dtos/update.governorates.dto';
+import { CityEntity } from '../../shared/entities/city.entity';
+import { CreateCityDto } from './dtos/create-city.dto';
+import { UpdateCityDto } from './dtos/update-city.dto';
 @Injectable()
 export class LocationService {
   constructor(
     @InjectRepository(GovernorateEntity)
     private readonly governorateRepo: Repository<GovernorateEntity>,
     @InjectRepository(CityEntity)
-    private readonly cityRepo: Repository<CityEntity>
+    private readonly cityRepo: Repository<CityEntity>,
   ) {}
 
   async getAllGovernorates() {
@@ -49,9 +49,7 @@ export class LocationService {
     });
 
     if (!governorate) {
-      throw new NotFoundException(
-        `Governorate with id ${createCityDto.governorate_id} not found`
-      );
+      throw new NotFoundException(`Governorate with id ${createCityDto.governorate_id} not found`);
     }
 
     const city = this.cityRepo.create(createCityDto);

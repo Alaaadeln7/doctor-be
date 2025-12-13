@@ -1,4 +1,4 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty } from '@nestjs/swagger';
 import {
   IsEmail,
   IsEnum,
@@ -7,12 +7,12 @@ import {
   Matches,
   MaxLength,
   MinLength,
-} from "class-validator";
+} from 'class-validator';
 
 export class CreateAdminDto {
   @ApiProperty({
-    description: "admin name",
-    example: "admin",
+    description: 'admin name',
+    example: 'admin',
     required: true,
     type: String,
   })
@@ -21,20 +21,20 @@ export class CreateAdminDto {
   name: string;
 
   @ApiProperty({
-    description: "admin password",
-    example: "password@0001",
+    description: 'admin password',
+    example: 'password@0001',
     required: true,
     type: String,
   })
   @MinLength(8)
   @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
-    message: "password too weak",
+    message: 'password too weak',
   })
   password: string;
 
   @ApiProperty({
-    description: "admin email",
-    example: "admin@gmail.com",
+    description: 'admin email',
+    example: 'admin@gmail.com',
     required: true,
     type: String,
   })
@@ -44,8 +44,8 @@ export class CreateAdminDto {
 
 export class LoginAdminDto {
   @ApiProperty({
-    description: "admin email",
-    example: "admin@gmail.com",
+    description: 'admin email',
+    example: 'admin@gmail.com',
     required: true,
     type: String,
   })
@@ -54,8 +54,8 @@ export class LoginAdminDto {
   email: string;
 
   @ApiProperty({
-    description: "admin password",
-    example: "password@0001",
+    description: 'admin password',
+    example: 'password@0001',
     required: true,
     type: String,
   })
@@ -63,8 +63,8 @@ export class LoginAdminDto {
   password: string;
 
   @ApiProperty({
-    description: "OTP sent to admin email",
-    example: "123456",
+    description: 'OTP sent to admin email',
+    example: '123456',
     required: true,
     type: String,
   })
@@ -74,8 +74,8 @@ export class LoginAdminDto {
 
 export class LoginAdminRequestDto {
   @ApiProperty({
-    description: "admin email",
-    example: "admin@gmail.com",
+    description: 'admin email',
+    example: 'admin@gmail.com',
     required: true,
     type: String,
   })
@@ -85,23 +85,23 @@ export class LoginAdminRequestDto {
 
 export class SignupResponseDto {
   name: string;
-  role: "admin" | "super_admin";
+  role: 'admin' | 'super_admin';
 }
 
 export class LoginRequestResponseDto {
   name: string;
-  role: "admin" | "super_admin";
+  role: 'admin' | 'super_admin';
 }
 
 export class UpdateMyAdminDataResponseDto {
   name: string;
-  role: "admin" | "super_admin";
+  role: 'admin' | 'super_admin';
 }
 
 export class VerifyAdminSignupDto {
   @ApiProperty({
-    description: "admin email",
-    example: "admin@gmail.com",
+    description: 'admin email',
+    example: 'admin@gmail.com',
     required: true,
     type: String,
   })
@@ -109,8 +109,8 @@ export class VerifyAdminSignupDto {
   email: string;
 
   @ApiProperty({
-    description: "OTP sent to admin email",
-    example: "123456",
+    description: 'OTP sent to admin email',
+    example: '123456',
     required: true,
     type: String,
   })
@@ -120,11 +120,11 @@ export class VerifyAdminSignupDto {
 
 export class ResetPasswordRequestDto {
   @ApiProperty({
-    name: "email",
-    description: "email of admin",
-    example: "admin@gmail.com",
+    name: 'email',
+    description: 'email of admin',
+    example: 'admin@gmail.com',
     required: true,
-    type: "string",
+    type: 'string',
   })
   @IsNotEmpty()
   @IsEmail()
@@ -133,31 +133,31 @@ export class ResetPasswordRequestDto {
 
 export class ResetPasswordDto {
   @ApiProperty({
-    name: "email",
-    description: "email of admin",
-    example: "admin@gmail.com",
+    name: 'email',
+    description: 'email of admin',
+    example: 'admin@gmail.com',
     required: true,
-    type: "string",
+    type: 'string',
   })
   @IsNotEmpty()
   @IsEmail()
   email: string;
 
   @ApiProperty({
-    description: "admin password",
-    example: "password@0001",
+    description: 'admin password',
+    example: 'password@0001',
     required: true,
     type: String,
   })
   @MinLength(8)
   @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
-    message: "password too weak",
+    message: 'password too weak',
   })
   password: string;
 
   @ApiProperty({
-    description: "OTP sent to admin email",
-    example: "123456",
+    description: 'OTP sent to admin email',
+    example: '123456',
     required: true,
     type: String,
   })
@@ -167,8 +167,8 @@ export class ResetPasswordDto {
 
 export class updateMyAdminDataDto {
   @ApiProperty({
-    description: "admin name",
-    example: "admin",
+    description: 'admin name',
+    example: 'admin',
     required: true,
     type: String,
   })
@@ -177,20 +177,20 @@ export class updateMyAdminDataDto {
   name: string;
 
   @ApiProperty({
-    description: "admin password",
-    example: "password@0001",
+    description: 'admin password',
+    example: 'password@0001',
     required: true,
     type: String,
   })
   @MinLength(8)
   @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
-    message: "password too weak",
+    message: 'password too weak',
   })
   password: string;
 
   @ApiProperty({
-    description: "admin email",
-    example: "admin@gmail.com",
+    description: 'admin email',
+    example: 'admin@gmail.com',
     required: true,
     type: String,
   })
@@ -201,16 +201,16 @@ export class updateMyAdminDataDto {
 export class BlockAdminDtoResponse {
   name: string;
   isActive: boolean;
-  role: "admin" | "super_admin";
+  role: 'admin' | 'super_admin';
 }
 
 export class VerifyAdminDtoResponse {
   name: string;
-  role: "admin" | "super_admin";
+  role: 'admin' | 'super_admin';
   isVerified: boolean;
 }
 
-type HttpMethod = "get" | "post" | "put" | "delete" | "patch";
+type HttpMethod = 'get' | 'post' | 'put' | 'delete' | 'patch';
 type pagesPermision = {
   [pageName: string]: HttpMethod[];
 };
@@ -219,7 +219,7 @@ export class UpdatePagesDto {
   @ApiProperty({
     type: Object,
     example: {
-      home: ["get", "post"],
+      home: ['get', 'post'],
     },
     required: true,
   })
@@ -230,60 +230,60 @@ export class UpdatePagesDto {
 export class updatePagesResponseDto {
   pages: pagesPermision;
   name: string;
-  role: "admin" | "super_admin";
+  role: 'admin' | 'super_admin';
 }
 
 export class getAllAdminsQueryDto {
   @ApiProperty({
-    name: "page",
-    description: "page number",
+    name: 'page',
+    description: 'page number',
     required: false,
-    type: "number",
+    type: 'number',
     default: 1,
   })
   @IsOptional()
   page: number;
 
   @ApiProperty({
-    name: "sorting",
-    type: "string",
-    enum: ["ASC", "DESC"],
-    default: "ASC",
+    name: 'sorting',
+    type: 'string',
+    enum: ['ASC', 'DESC'],
+    default: 'ASC',
     required: false,
   })
-  @IsEnum(["ASC", "DESC"])
+  @IsEnum(['ASC', 'DESC'])
   @IsOptional()
-  sorting: "ASC" | "DESC";
+  sorting: 'ASC' | 'DESC';
 
   @ApiProperty({
-    name: "limit",
+    name: 'limit',
     required: false,
-    type: "number",
+    type: 'number',
     default: 10,
   })
   @IsOptional()
   limit?: number;
 
   @ApiProperty({
-    name: "isActive",
+    name: 'isActive',
     required: false,
-    type: "boolean",
+    type: 'boolean',
   })
   @IsOptional()
   isActive?: boolean;
 
   @ApiProperty({
-    name: "isVerified",
+    name: 'isVerified',
     required: false,
-    type: "boolean",
+    type: 'boolean',
   })
   @IsOptional()
   isVerified?: boolean;
 
   @ApiProperty({
-    name: "search",
+    name: 'search',
     required: false,
-    type: "string",
+    type: 'string',
   })
   @IsOptional()
   search?: string;

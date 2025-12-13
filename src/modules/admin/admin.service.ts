@@ -1,20 +1,16 @@
 /* eslint-disable */
 
-import {
-  ConflictException,
-  Injectable,
-  NotFoundException,
-} from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
-import { InjectRepository } from "@nestjs/typeorm";
-import { paginate, Pagination } from "nestjs-typeorm-paginate";
-import { Repository } from "typeorm";
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { InjectRepository } from '@nestjs/typeorm';
+import { paginate, Pagination } from 'nestjs-typeorm-paginate';
+import { Repository } from 'typeorm';
 
-import { BcryptUtilService } from "../../common/utils/bcrypt.util";
-import { JwtUtilService } from "../../common/utils/jwt.utils";
-import { OtpUtilService } from "../../common/utils/otp.util";
-import { MailService } from "../../mail/mail.service";
-import { AdminEntity } from "../../shared/entities/admins.entity";
+import { BcryptUtilService } from '../../common/utils/bcrypt.util';
+import { JwtUtilService } from '../../common/utils/jwt.utils';
+import { OtpUtilService } from '../../common/utils/otp.util';
+import { MailService } from '../../mail/mail.service';
+import { AdminEntity } from '../../shared/entities/admins.entity';
 import {
   BlockAdminDtoResponse,
   CreateAdminDto,
@@ -31,8 +27,8 @@ import {
   updatePagesResponseDto,
   VerifyAdminDtoResponse,
   VerifyAdminSignupDto,
-} from "../../shared/dtos/admin.dto";
-import response from "../../common/utils/response.pattern";
+} from '../../shared/dtos/admin.dto';
+import response from '../../common/utils/response.pattern';
 
 /**
  * Service for managing admin operations including authentication, profile management, and admin CRUD
@@ -46,7 +42,7 @@ export class AdminService {
     private readonly jwtService: JwtUtilService,
     private readonly otpService: OtpUtilService,
     private readonly configService: ConfigService,
-    private readonly mailService: MailService
+    private readonly mailService: MailService,
   ) {}
 
   /**
@@ -66,7 +62,7 @@ export class AdminService {
     });
 
     if (!newAdmin) {
-      throw new ConflictException("Failed to create admin account");
+      throw new ConflictException('Failed to create admin account');
     }
 
     const otp = this.otpService.generateComplexOtp(6);
@@ -77,10 +73,10 @@ export class AdminService {
         newAdmin.name,
         newAdmin.email,
         newAdmin.otp,
-        "https://yourapp.com/admin/verify-signup"
+        'https://yourapp.com/admin/verify-signup',
       );
     } catch (error) {
-      console.error("Error sending admin signup email:", error);
+      console.error('Error sending admin signup email:', error);
     }
 
     const savedAdmin = await this.adminRepo.save(newAdmin);
@@ -98,22 +94,20 @@ export class AdminService {
    * @throws NotFoundException if admin not found
    * @throws ConflictException if OTP is invalid
    */
-  async verifyAdminSignup(
-    data: VerifyAdminSignupDto
-  ): Promise<SignupResponseDto> {
+  async verifyAdminSignup(data: VerifyAdminSignupDto): Promise<SignupResponseDto> {
     const { email, otp } = data;
 
     const admin = await this.adminRepo.findOne({ where: { email } });
     if (!admin) {
-      throw new NotFoundException("Admin not found");
+      throw new NotFoundException('Admin not found');
     }
 
     if (admin.otp !== otp) {
-      throw new ConflictException("Invalid OTP");
+      throw new ConflictException('Invalid OTP');
     }
 
     admin.isActive = true;
-    admin.otp = "";
+    admin.otp = '';
 
     const savedAdmin = await this.adminRepo.save(admin);
 
@@ -129,14 +123,12 @@ export class AdminService {
    * @returns Admin details for login response
    * @throws NotFoundException if admin not found
    */
-  async loginAdminRequest(
-    data: LoginAdminRequestDto
-  ): Promise<LoginRequestResponseDto> {
+  async loginAdminRequest(data: LoginAdminRequestDto): Promise<LoginRequestResponseDto> {
     const { email } = data;
 
     const admin = await this.adminRepo.findOne({ where: { email } });
     if (!admin) {
-      throw new NotFoundException("Admin not found");
+      throw new NotFoundException('Admin not found');
     }
 
     const otp = this.otpService.generateComplexOtp(6);
@@ -147,10 +139,10 @@ export class AdminService {
         admin.name,
         admin.email,
         admin.otp,
-        "https://yourapp.com/admin/verify-signup"
+        'https://yourapp.com/admin/verify-signup',
       );
     } catch (error) {
-      console.error("Error sending admin signup email:", error);
+      console.error('Error sending admin signup email:', error);
     }
 
     await this.adminRepo.save(admin);
@@ -173,20 +165,17 @@ export class AdminService {
 
     const admin = await this.adminRepo.findOne({ where: { email } });
     if (!admin) {
-      throw new NotFoundException("Admin not found");
+      throw new NotFoundException('Admin not found');
     }
 
     if (admin.otp !== otp) {
-      throw new ConflictException("Invalid OTP");
+      throw new ConflictException('Invalid OTP');
     }
 
-    const isPasswordValid = await this.bcryptService.bcryptCompareUtil(
-      password,
-      admin.password
-    );
+    const isPasswordValid = await this.bcryptService.bcryptCompareUtil(password, admin.password);
 
     if (!isPasswordValid) {
-      throw new ConflictException("Invalid password");
+      throw new ConflictException('Invalid password');
     }
 
     const token = this.jwtService.generateToken({
@@ -199,17 +188,12 @@ export class AdminService {
     });
 
     try {
-      await this.mailService.sendLoginEmail(
-        admin.name,
-        admin.email,
-        otp,
-        "https://www.google.com"
-      );
+      await this.mailService.sendLoginEmail(admin.name, admin.email, otp, 'https://www.google.com');
     } catch (error) {
-      console.error("Failed to send login email:", error);
+      console.error('Failed to send login email:', error);
     }
 
-    admin.otp = "";
+    admin.otp = '';
     await this.adminRepo.save(admin);
 
     return { token };
@@ -227,7 +211,7 @@ export class AdminService {
     });
 
     if (!admin) {
-      throw new NotFoundException("Admin not found");
+      throw new NotFoundException('Admin not found');
     }
 
     const otp = this.otpService.generateComplexOtp(6);
@@ -238,14 +222,14 @@ export class AdminService {
         admin.name,
         admin.email,
         otp,
-        `${this.configService.get<string>("FE_URL")}`
+        `${this.configService.get<string>('FE_URL')}`,
       );
     } catch (error) {
-      console.error("Failed to send login email:", error);
+      console.error('Failed to send login email:', error);
     }
 
     return {
-      message: "Reset password request sent successfully",
+      message: 'Reset password request sent successfully',
     };
   }
 
@@ -262,19 +246,17 @@ export class AdminService {
     });
 
     if (!admin) {
-      throw new NotFoundException("Admin not found");
+      throw new NotFoundException('Admin not found');
     }
 
     if (admin.otp !== data.otp) {
-      throw new ConflictException("Invalid OTP");
+      throw new ConflictException('Invalid OTP');
     }
 
-    const hashedPassword = await this.bcryptService.bcryptHashingUtil(
-      data.password
-    );
+    const hashedPassword = await this.bcryptService.bcryptHashingUtil(data.password);
 
     admin.password = hashedPassword;
-    admin.otp = "";
+    admin.otp = '';
 
     await this.adminRepo.save(admin);
 
@@ -290,13 +272,13 @@ export class AdminService {
    */
   async updateMyAdminData(
     data: updateMyAdminDataDto,
-    id: number
+    id: number,
   ): Promise<UpdateMyAdminDataResponseDto> {
     const { name, email, password } = data;
 
     const admin = await this.adminRepo.findOne({ where: { id } });
     if (!admin) {
-      throw new ConflictException("Admin not found");
+      throw new ConflictException('Admin not found');
     }
 
     if (name && name !== admin.name) {
@@ -309,29 +291,23 @@ export class AdminService {
       admin.otp = otp;
 
       const hashedOtp = await this.bcryptService.bcryptHashingUtil(otp);
-      const token = this.jwtService.generateToken(
-        { otp: hashedOtp, email },
-        "1h"
-      );
+      const token = this.jwtService.generateToken({ otp: hashedOtp, email }, '1h');
 
       try {
         await this.mailService.sendUpdateMyAdminDataEmail(
           admin.name,
           admin.email,
-          `${this.configService.get<string>("FE_URL")}/${token}`
+          `${this.configService.get<string>('FE_URL')}/${token}`,
         );
       } catch (error) {
-        console.error("Failed to send login email:", error);
+        console.error('Failed to send login email:', error);
       }
 
       admin.isVerified = false;
     }
 
     if (password) {
-      const isSamePassword = await this.bcryptService.bcryptCompareUtil(
-        password,
-        admin.password
-      );
+      const isSamePassword = await this.bcryptService.bcryptCompareUtil(password, admin.password);
 
       if (!isSamePassword) {
         admin.password = await this.bcryptService.bcryptHashingUtil(password);
@@ -361,20 +337,17 @@ export class AdminService {
 
     const admin = await this.adminRepo.findOne({ where: { email } });
     if (!admin) {
-      throw new NotFoundException("Admin not found");
+      throw new NotFoundException('Admin not found');
     }
 
-    const isOtpCorrect = await this.bcryptService.bcryptCompareUtil(
-      admin.otp,
-      otp
-    );
+    const isOtpCorrect = await this.bcryptService.bcryptCompareUtil(admin.otp, otp);
 
     if (!isOtpCorrect) {
-      throw new ConflictException("Invalid OTP");
+      throw new ConflictException('Invalid OTP');
     }
 
     admin.isVerified = true;
-    admin.otp = "";
+    admin.otp = '';
 
     await this.adminRepo.save(admin);
 
@@ -405,7 +378,7 @@ export class AdminService {
     });
 
     if (!admin) {
-      throw new NotFoundException("Admin not found");
+      throw new NotFoundException('Admin not found');
     }
 
     return admin;
@@ -420,7 +393,7 @@ export class AdminService {
   async blockAdmin(id: number): Promise<BlockAdminDtoResponse> {
     const admin = await this.adminRepo.findOne({ where: { id } });
     if (!admin) {
-      throw new NotFoundException("Admin not found");
+      throw new NotFoundException('Admin not found');
     }
 
     admin.isActive = !admin.isActive;
@@ -442,7 +415,7 @@ export class AdminService {
   async verifyAdmin(id: number): Promise<VerifyAdminDtoResponse> {
     const admin = await this.adminRepo.findOne({ where: { id } });
     if (!admin) {
-      throw new NotFoundException("Admin not found");
+      throw new NotFoundException('Admin not found');
     }
 
     admin.isVerified = !admin.isVerified;
@@ -462,13 +435,10 @@ export class AdminService {
    * @returns Updated page permissions
    * @throws NotFoundException if admin not found
    */
-  async updatePages(
-    data: UpdatePagesDto,
-    id: number
-  ): Promise<updatePagesResponseDto> {
+  async updatePages(data: UpdatePagesDto, id: number): Promise<updatePagesResponseDto> {
     const admin = await this.adminRepo.findOne({ where: { id } });
     if (!admin) {
-      throw new NotFoundException("Admin not found");
+      throw new NotFoundException('Admin not found');
     }
 
     admin.pages = data.pages;
@@ -501,7 +471,7 @@ export class AdminService {
     });
 
     if (!admin) {
-      throw new NotFoundException("Admin not found");
+      throw new NotFoundException('Admin not found');
     }
 
     return admin;
@@ -512,44 +482,35 @@ export class AdminService {
    * @param queries - Query parameters for pagination and filtering
    * @returns Paginated list of admins
    */
-  async getAllAdmins(
-    queries: getAllAdminsQueryDto
-  ): Promise<Pagination<AdminEntity>> {
-    const adminsQuery = this.adminRepo.createQueryBuilder("admin");
+  async getAllAdmins(queries: getAllAdminsQueryDto): Promise<Pagination<AdminEntity>> {
+    const adminsQuery = this.adminRepo.createQueryBuilder('admin');
 
     adminsQuery
-      .select([
-        "admin.id",
-        "admin.name",
-        "admin.email",
-        "admin.isActive",
-        "admin.isVerified",
-      ])
-      .orderBy("admin.id", queries.sorting ?? "ASC");
+      .select(['admin.id', 'admin.name', 'admin.email', 'admin.isActive', 'admin.isVerified'])
+      .orderBy('admin.id', queries.sorting ?? 'ASC');
 
     if (queries?.isActive !== undefined) {
-      adminsQuery.andWhere("admin.isActive = :isActive", {
+      adminsQuery.andWhere('admin.isActive = :isActive', {
         isActive: queries.isActive,
       });
     }
 
     if (queries?.isVerified !== undefined) {
-      adminsQuery.andWhere("admin.isVerified = :isVerified", {
+      adminsQuery.andWhere('admin.isVerified = :isVerified', {
         isVerified: queries.isVerified,
       });
     }
 
     if (queries?.search) {
-      adminsQuery.andWhere(
-        "(admin.name LIKE :search OR admin.email LIKE :search)",
-        { search: `%${queries.search}%` }
-      );
+      adminsQuery.andWhere('(admin.name LIKE :search OR admin.email LIKE :search)', {
+        search: `%${queries.search}%`,
+      });
     }
 
     return paginate<AdminEntity>(adminsQuery, {
       page: queries.page ?? 1,
       limit: queries.limit ?? 10,
-      route: "/admin/all",
+      route: '/admin/all',
     });
   }
 }

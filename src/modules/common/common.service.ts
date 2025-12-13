@@ -1,23 +1,19 @@
 /* eslint-disable */
 
-import {
-  BadRequestException,
-  ConflictException,
-  Injectable,
-} from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { OtpUtilService } from "../..//common/utils/otp.util";
+import { BadRequestException, ConflictException, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { OtpUtilService } from '../..//common/utils/otp.util';
 import {
   ContactUsDto,
   ResendOtpCodeDto,
   ResendOtpResponseDto,
-} from "../..//shared/dtos/common.dto";
-import { AdminEntity } from "../../shared/entities/admins.entity";
-import { DoctorEntity } from "../../shared/entities/doctors.entity";
-import { Repository } from "typeorm";
-import { CategoryService } from "../category/category.service";
-import { LocationService } from "../location/location.service";
-import { MailService } from "../../mail/mail.service";
+} from '../..//shared/dtos/common.dto';
+import { AdminEntity } from '../../shared/entities/admins.entity';
+import { DoctorEntity } from '../../shared/entities/doctors.entity';
+import { Repository } from 'typeorm';
+import { CategoryService } from '../category/category.service';
+import { LocationService } from '../location/location.service';
+import { MailService } from '../../mail/mail.service';
 
 @Injectable()
 export class CommonService {
@@ -29,23 +25,23 @@ export class CommonService {
     @InjectRepository(AdminEntity)
     private readonly adminRepo: Repository<AdminEntity>,
     private readonly otpService: OtpUtilService,
-    private readonly mailService: MailService
+    private readonly mailService: MailService,
   ) {}
   async resendOtpCode(data: ResendOtpCodeDto): Promise<ResendOtpResponseDto> {
     if (!data.email || !data.phone)
-      throw new BadRequestException("email or phone required, at least one!!");
-    const model = data.model == "admin" ? this.adminRepo : this.doctorRepo;
+      throw new BadRequestException('email or phone required, at least one!!');
+    const model = data.model == 'admin' ? this.adminRepo : this.doctorRepo;
     const findUser = await model.findOne({
       where: [{ email: data.email }, { phone: data.phone }],
     });
-    if (!findUser) throw new ConflictException("Account not found!!");
+    if (!findUser) throw new ConflictException('Account not found!!');
     const otp = this.otpService.generateComplexOtp(6);
     findUser.otp = otp;
     const name =
-      data.model == "admin"
+      data.model == 'admin'
         ? (findUser as AdminEntity).name
         : (findUser as DoctorEntity).fullName.fname +
-          " " +
+          ' ' +
           (findUser as DoctorEntity).fullName.lname;
     const isEmail = data.email ? true : false;
     if (isEmail) {
@@ -53,7 +49,7 @@ export class CommonService {
         await this.mailService.sendResendCodeEmail(name, data.email, otp);
       } catch (error) {
         console.log(error);
-        throw new BadRequestException("Something went wrong!!");
+        throw new BadRequestException('Something went wrong!!');
       }
     }
     return {
@@ -74,14 +70,10 @@ export class CommonService {
 
   async contactUs(data: ContactUsDto) {
     try {
-      await this.mailService.sendContactUsEmail(
-        data.name,
-        data.email,
-        data.message
-      );
+      await this.mailService.sendContactUsEmail(data.name, data.email, data.message);
     } catch (error) {
       console.log(error);
-      throw new BadRequestException("Something went wrong!!");
+      throw new BadRequestException('Something went wrong!!');
     }
     return null;
   }
