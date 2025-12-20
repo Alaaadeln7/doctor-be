@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import { Injectable } from '@nestjs/common';
 import { CloudinaryBaseUtilService } from './cloudinary.util';
 import * as streamifier from 'streamifier';

@@ -156,19 +156,18 @@ export class FileService {
     if (!doctor) {
       throw new NotFoundException('Doctor profile not found');
     }
-    // All three files are required for first time
+
     if (!files.card?.length || !files.fid?.length) {
       throw new BadRequestException([
         'You must upload all three files: card and identification front and back',
       ]);
     }
     const filesObjs = [files.card[0], files.fid[0]];
-    // Upload all files
+
     const uploadedFiles = await this.storageService.uploadFiles(filesObjs, 'doctors/auth');
     if (!uploadedFiles || uploadedFiles.length === 0) {
       throw new BadRequestException(['File upload failed, please try again']);
     }
-    // Build auth object from uploaded files
     const doctorFiles = {
       card:
         uploadedFiles.find((file) => file.public_id && file.public_id.includes('card')) ||

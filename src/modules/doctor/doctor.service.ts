@@ -33,6 +33,7 @@ import { BcryptUtilService } from '../../common/utils/bcrypt.util';
 import { CategoryService } from '../category/category.service';
 import { MailService } from '../../mail/mail.service';
 import { DoctorProvider } from './doctor.provider';
+import { StorageUtilService } from 'src/common/utils/storage.util';
 
 @Injectable()
 export class DoctorService {
@@ -47,6 +48,7 @@ export class DoctorService {
     private readonly bcryptService: BcryptUtilService,
     private readonly categoryService: CategoryService,
     private readonly mailService: MailService,
+    private readonly StorageUtilService: StorageUtilService,
   ) {}
 
   async doctorSignup(data: AddDoctorDto): Promise<DoctorResponseType & { token: string }> {
@@ -423,6 +425,21 @@ export class DoctorService {
   }
 
   public async uploadPaymentImage(file: Express.Multer.File, doctorId: number) {
-    // Implementation needed
+    if (!file) throw new BadRequestException('No file provided');
+    if (!doctorId) throw new BadRequestException('Doctor id not provided');
+
+    const doctor = await this.doctorProvider.findById(doctorId);
+
+    const uploadResult = await this.StorageUtilService.uploadFile(file, 'doctors/payment');
+    if (!uploadResult || !uploadResult.url) {
+      throw new ConflictException('Could not upload image');
+    }
+
+    if (!doctor) throw new NotFoundException('Doctor not found');
+
+    doctor.paymentImage = uploadResult.url;
+    await this.doctorProvider.save(doctor);
+
+    return { success: true, url: uploadResult.url, doctorId };
   }
 }

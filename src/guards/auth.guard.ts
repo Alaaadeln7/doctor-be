@@ -10,10 +10,10 @@ export class AuthGuard implements CanActivate {
     private readonly reflector: Reflector,
   ) {}
 
-  async canActivate(context: ExecutionContext): Promise<boolean> {
+  canActivate(context: ExecutionContext): Promise<boolean> {
     const isPublic = this.reflector.get<boolean>('isPublic', context.getHandler());
 
-    if (isPublic) return true;
+    if (isPublic) return Promise.resolve(true);
 
     const request = context.switchToHttp().getRequest<Request>();
     const authHeader = request.headers.authorization;
@@ -25,13 +25,15 @@ export class AuthGuard implements CanActivate {
     const token = authHeader.split(' ')[1];
 
     try {
-      const decodedToken = await this.jwtService.verifyToken(token);
+      const decodedToken = this.jwtService.verifyToken(token) as {
+        email: string;
+        id: number;
+      } | null;
 
-      // Define `user` property on Request safely
       (request as Request & { user?: unknown }).user = decodedToken;
-
-      return true;
+      return Promise.resolve(true);
     } catch (error) {
+      console.log(error);
       throw new UnauthorizedException('Invalid or expired token');
     }
   }
