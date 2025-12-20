@@ -47,7 +47,7 @@ import type { Request, Response } from 'express';
 import { DoctorEntity, FileClass } from '../../shared/entities/doctors.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AuthGuard } from 'src/guards/auth.guard';
-
+import { Express } from 'express';
 @Controller('/doctor')
 export class DoctorController {
   constructor(
