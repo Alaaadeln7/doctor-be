@@ -5,6 +5,7 @@ import {
   Controller,
   Get,
   HttpCode,
+  HttpStatus,
   Param,
   Patch,
   Post,
@@ -12,6 +13,9 @@ import {
   Query,
   Req,
   Res,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import {
   AddDoctorDto,
@@ -30,25 +34,59 @@ import {
 import { DoctorService } from './doctor.service';
 import { Public } from '../../common/decorators/public.decorator';
 import { DoctorResponseType } from '../../shared/type/doctor.type';
-import { ApiBearerAuth, ApiExcludeEndpoint, ApiParam, ApiQuery } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiExcludeEndpoint,
+  ApiParam,
+  ApiQuery,
+  ApiConsumes,
+  ApiBody,
+} from '@nestjs/swagger';
 import { JwtUtilService } from '../../common/utils/jwt.utils';
 import type { Request, Response } from 'express';
 import { DoctorEntity, FileClass } from '../../shared/entities/doctors.entity';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { AuthGuard } from 'src/guards/auth.guard';
 
-@Controller('doctor')
+@Controller('/doctor')
 export class DoctorController {
   constructor(
     private readonly doctorService: DoctorService,
     private readonly jwtService: JwtUtilService,
   ) {}
 
+  @Post('upload-payment-image')
+  @ApiBearerAuth('access-token')
+  @UseGuards(AuthGuard)
+  @UseInterceptors(FileInterceptor('paymentImage'))
+  @ApiConsumes('multipart/form-data')
+  @HttpCode(HttpStatus.CREATED)
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        paymentImage: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  async uploadPaymentImage(@Req() req: Request, @UploadedFile() paymentImage: Express.Multer.File) {
+    if (!paymentImage) {
+      throw new BadRequestException('Payment image file is required');
+    }
+    const { id } = req['user'];
+    return this.doctorService.uploadPaymentImage(paymentImage, +id);
+  }
+
   @Post('/signup')
   @Public()
-  async doctorSignup(@Body() data: AddDoctorDto): Promise<DoctorResponseType> {
+  async doctorSignup(@Body() data: AddDoctorDto): Promise<DoctorResponseType & { token: string }> {
     return this.doctorService.doctorSignup(data);
   }
 
-  @Post('verify-signup')
+  @Post('/verify-signup')
   @Public()
   async doctorProfileVerifyAccountEmail(@Body() data: doctorProfleVerifeAccountEmailDto) {
     return this.doctorService.doctorProfileVerifyAccountEmail(data);
@@ -85,7 +123,7 @@ export class DoctorController {
     return this.doctorService.updateMyDoctorProfileRawData(data, id);
   }
 
-  @Get('verify-update-email')
+  @Get('/verify-update-email')
   @Public()
   async verifyUpdatedEmail(@Res() res: Response, @Query('token') token: string) {
     const decoded = this.jwtService.verifyToken(token);
@@ -96,7 +134,7 @@ export class DoctorController {
   }
 
   @Public()
-  @Post('verify_doctor_email_after_update_otp_using')
+  @Post('/verify-doctor-email-after-update-otp')
   @ApiExcludeEndpoint()
   async verifyDoctorEmailAfterUpdateOtp(
     @Body('otp') otp: string,
@@ -114,31 +152,34 @@ export class DoctorController {
   }
 
   @Public()
-  @Post('reset-password-request')
+  @Post('/reset-password-request')
   async doctorResetPasswordRequest(@Body() data: doctorProfileResetPasswordDto) {
     return this.doctorService.doctorResetPasswordRequest(data);
   }
 
   @Public()
-  @Post('reset-password')
+  @Post('/reset-password')
   async doctorResetPassword(@Body() data: doctorProfileResetPasswordDoDto) {
     return this.doctorService.doctorResetPassword(data);
   }
 
-  @Put('choose-category')
+  @Put('/choose-category')
+  @ApiBearerAuth('access-token')
   @HttpCode(200)
   async chooseCategory(@Body() data: doctorProfileChooseCategoryDto, @Req() req: Request) {
     const id = req['user'].id;
     return this.doctorService.doctorProfileChooseCategory(data, +id);
   }
 
-  @Patch('update-password')
+  @Patch('/update-password')
+  @ApiBearerAuth('access-token')
   async doctorProfileUpdatePassword(@Body() data: updatePasswordDto, @Req() req: Request) {
     const { id } = req['user'];
     return this.doctorService.doctorProfileUpdatePassword(data, +id);
   }
 
-  @Patch(':id/view')
+  @Patch('/:id/view')
+  @Public()
   @HttpCode(204)
   @ApiParam({
     name: 'id',
@@ -173,24 +214,28 @@ export class DoctorController {
   })
   @ApiQuery({ name: 'orderKey', required: false, enum: orderKeyEnums })
   @ApiQuery({ name: 'orderValue', required: false, enum: ['ASC', 'DESC'] })
+  @ApiQuery({ name: 'search', required: false, type: String })
+  @ApiQuery({ name: 'best', required: false, type: String })
+  @ApiQuery({ name: 'governorate', required: false, type: String })
+  @ApiQuery({ name: 'center', required: false, type: String })
   @Public()
   async getAllDoctors(@Query() queries: GetDoctorQueriesDto) {
     const { orderKey, orderValue, search, best, price, governorate, center, page, limit } = queries;
 
-    const directDoctoFilters = {
-      page: Number(page),
-      limit: Number(limit),
+    const directDoctorFilters: any = {
+      page: page ? Number(page) : 1,
+      limit: limit ? Number(limit) : 10,
     };
 
-    orderKey && (directDoctoFilters['orderKey'] = orderKey);
-    orderValue && (directDoctoFilters['orderValue'] = orderValue);
-    search && (directDoctoFilters['search'] = search);
-    price && (directDoctoFilters['price'] = price);
-    best && (directDoctoFilters['best'] = best);
-    governorate && (directDoctoFilters['governorate'] = governorate);
-    center && (directDoctoFilters['center'] = center);
+    if (orderKey) directDoctorFilters.orderKey = orderKey;
+    if (orderValue) directDoctorFilters.orderValue = orderValue;
+    if (search) directDoctorFilters.search = search;
+    if (price) directDoctorFilters.price = price;
+    if (best) directDoctorFilters.best = best;
+    if (governorate) directDoctorFilters.governorate = governorate;
+    if (center) directDoctorFilters.center = center;
 
-    return this.doctorService.getAllDoctors(directDoctoFilters);
+    return this.doctorService.getAllDoctors(directDoctorFilters);
   }
 
   @Patch('/handle-block/:id')

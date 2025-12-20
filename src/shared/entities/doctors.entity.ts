@@ -69,6 +69,9 @@ export class DoctorEntity {
     date: Date;
   }[];
 
+  @Column({ type: 'varchar', nullable: true })
+  paymentImage: string;
+
   @Column({ type: 'jsonb', nullable: true })
   clinic: {
     name: string;
