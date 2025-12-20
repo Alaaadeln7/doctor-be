@@ -12,6 +12,7 @@ import { OtpUtilService } from '../../common/utils/otp.util';
 import { CategoryModule } from '../category/category.module';
 import { WorkingHoursEntity } from '../../shared/entities/workinHours.entity';
 import { MailModule } from '../../mail/mail.module';
+import { DoctorProvider } from './doctor.provider';
 
 @Module({
   imports: [
@@ -29,6 +30,9 @@ import { MailModule } from '../../mail/mail.module';
     JwtUtilService,
     OtpUtilService,
     BcryptUtilService,
+    DoctorProvider,
+    DoctorProvider,
   ],
+  exports: [DoctorService, DoctorProvider],
 })
 export class DoctorModule {}

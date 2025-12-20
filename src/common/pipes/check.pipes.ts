@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { ConflictException, Injectable, PipeTransform } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateAdminDto } from '../../shared/dtos/admin.dto';

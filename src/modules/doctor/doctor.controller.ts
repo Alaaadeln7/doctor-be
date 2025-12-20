@@ -200,4 +200,13 @@ export class DoctorController {
     const idNo = +id;
     return this.doctorService.handleBlockDoctor(idNo);
   }
+
+
+  @Post("/upload-payment-image")
+  @ApiBearerAuth('access-token')
+  async uploadPaymentImage(@Req() req: Request) {
+    const { id } = req['user'];
+    const file = req['file'] as Express.Multer.File;
+    return this.doctorService.uploadPaymentImage(file,+id);
+  }
 }

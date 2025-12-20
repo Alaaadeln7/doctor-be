@@ -18,32 +18,26 @@ import {
   GetDoctorQueriesDto,
   LoginDoctorDto,
   updatePasswordDto,
-} from '../..//shared/dtos/doctor.dto';
-import { DoctorEntity, FileClass } from '../..//shared/entities/doctors.entity';
-import { Repository } from 'typeorm';
+} from '../../shared/dtos/doctor.dto';
+import { DoctorEntity } from '../../shared/entities/doctors.entity';
 import { CredentialService } from '../credential/credential.service';
-import { InjectRepository } from '@nestjs/typeorm';
 import { PlanService } from '../plan/plan.service';
-import { CodeUtilService } from '../..//common/utils/code.util';
-import { OtpUtilService } from '../..//common/utils/otp.util';
-import { DoctorResponseType } from '../..//shared/type/doctor.type';
-import { JwtUtilService } from '../..//common/utils/jwt.utils';
+import { CodeUtilService } from '../../common/utils/code.util';
+import { OtpUtilService } from '../../common/utils/otp.util';
+import { DoctorResponseType } from '../../shared/type/doctor.type';
+import { JwtUtilService } from '../../common/utils/jwt.utils';
 import { ConfigService } from '@nestjs/config';
 import type { Response } from 'express';
-import DoctorVerifyUpdateEmail from '../..//common/pages/doctor.verifyUpdateEmail';
-import { BcryptUtilService } from '../..//common/utils/bcrypt.util';
+import DoctorVerifyUpdateEmail from '../../common/pages/doctor.verifyUpdateEmail';
+import { BcryptUtilService } from '../../common/utils/bcrypt.util';
 import { CategoryService } from '../category/category.service';
-import { WorkingHoursEntity } from '../..//shared/entities/workinHours.entity';
-import { paginate } from 'nestjs-typeorm-paginate';
 import { MailService } from '../../mail/mail.service';
+import { DoctorProvider } from './doctor.provider';
 
 @Injectable()
 export class DoctorService {
   constructor(
-    @InjectRepository(DoctorEntity)
-    private readonly doctorRepo: Repository<DoctorEntity>,
-    @InjectRepository(WorkingHoursEntity)
-    private readonly workingHoursRepo: Repository<WorkingHoursEntity>,
+    private readonly doctorProvider: DoctorProvider,
     private readonly credintialService: CredentialService,
     private readonly planService: PlanService,
     private readonly codeService: CodeUtilService,
@@ -58,17 +52,11 @@ export class DoctorService {
   async doctorSignup(data: AddDoctorDto): Promise<DoctorResponseType & { token: string }> {
     const { email, phone } = data;
 
-    // Check if a doctor with the same email or phone already exists
-    const existingDoctor = await this.doctorRepo.findOne({
-      where: [{ email }, { phone }],
-    });
-
+    const existingDoctor = await this.doctorProvider.findByEmailOrPhone(email, phone);
     if (existingDoctor) throw new ConflictException('Email or phone already in use');
 
-    // Create a new doctor entity from the provided data
-    const doctor = this.doctorRepo.create(data);
+    const doctor = this.doctorProvider.create(data);
 
-    // Create credentials for the new doctor
     const credential = await this.credintialService.createDoctorCredits({
       password: await this.bcryptService.bcryptHashingUtil(data.password),
       doctor,
@@ -76,35 +64,23 @@ export class DoctorService {
 
     if (!credential) throw new ConflictException('Failed to create doctor credits');
 
-    // Get the basic plan to assign to the doctor
     const basicPlan = await this.planService.getTheBasicPlan();
-
     if (!basicPlan) throw new ConflictException('Basic plan not found');
 
-    // Generate an affiliate code for the doctor
     let code = this.codeService.makeAfliateCode({
       id: doctor.id,
       fullName: doctor.fullName,
     });
-    doctor.code = {
-      code,
-      count: 0,
-    };
-
-    // Assign the plan and credentials to the doctor
+    doctor.code = { code, count: 0 };
     doctor.plan = basicPlan;
     doctor.credential = credential;
 
-    // Generate a 6-digit OTP for the doctor
     let otp = this.otpService.generateComplexOtp(6);
     doctor.otp = otp;
 
-    // Save the new doctor entity to the database
-    const savedDoctor = await this.doctorRepo.save(doctor);
-
+    const savedDoctor = await this.doctorProvider.save(doctor);
     if (!savedDoctor) throw new ConflictException('Failed to save doctor');
 
-    // Send a signup confirmation email with the OTP
     try {
       await this.mailService.sendDoctorSignupEmail(
         savedDoctor.fullName.fname + ' ' + savedDoctor.fullName.lname,
@@ -115,7 +91,7 @@ export class DoctorService {
     } catch (error) {
       console.error('Error sending doctor signup email:', error);
     }
-    // generate token to use it in auth files upload
+
     const token = this.jwtService.generateToken({
       fullName: savedDoctor.fullName.fname + ' ' + savedDoctor.fullName.lname,
       id: savedDoctor.id,
@@ -123,7 +99,7 @@ export class DoctorService {
       isVerified: savedDoctor.isVerified,
       email: savedDoctor.email,
     });
-    // Return the saved doctor
+
     return {
       fullName: savedDoctor.fullName.fname + ' ' + savedDoctor.fullName.lname,
       isActive: savedDoctor.isActive,
@@ -134,14 +110,14 @@ export class DoctorService {
 
   async doctorProfileVerifyAccountEmail(data: doctorProfleVerifeAccountEmailDto) {
     const { email, otp } = data;
-    const doctor = await this.doctorRepo.findOne({ where: { email } });
+    const doctor = await this.doctorProvider.findByEmail(email);
     if (!doctor) throw new NotFoundException('Doctor account not found!!');
     if (!doctor.otp || doctor.otp != otp)
       throw new ConflictException('Something went wrong with otp!!');
     doctor.isVerified = true;
     doctor.otp = '';
     try {
-      await this.doctorRepo.save(doctor);
+      await this.doctorProvider.save(doctor);
       return {
         fullName: doctor.fullName.fname + ' ' + doctor.fullName.lname,
         isActive: doctor.isActive,
@@ -157,12 +133,10 @@ export class DoctorService {
     doctor: {
       name: { fname: string; lname: string };
       email: string;
-      img: string | FileClass;
+      img: string | any;
     };
   }> {
-    const doctor = await this.doctorRepo.findOne({
-      where: { email: data.email },
-    });
+    const doctor = await this.doctorProvider.findByEmail(data.email);
     if (!doctor) throw new NotFoundException('Account not found!');
     if (!doctor.isActive) throw new ConflictException('Account is not active!');
     if (!doctor.isVerified) throw new ConflictException('Account is not verified!');
@@ -184,18 +158,13 @@ export class DoctorService {
   ): Promise<DoctorResponseType> {
     const { email, phone, fullName, address, clinic } = data;
 
-    const doctor = await this.doctorRepo.findOne({ where: { id: doctorId } });
-    if (!doctor) {
-      throw new NotFoundException('Doctor not found!');
-    }
+    const doctor = await this.doctorProvider.findById(doctorId);
+    if (!doctor) throw new NotFoundException('Doctor not found!');
 
     const existingImgs = doctor.clinic?.imgs || [];
-    let isEmailChanged = false;
-
     const updates: Partial<typeof doctor> = {};
 
     if (email && email !== doctor.email) {
-      isEmailChanged = true;
       updates.email = email;
       updates.isVerified = false;
       updates.otp = this.otpService.generateComplexOtp(6);
@@ -214,10 +183,7 @@ export class DoctorService {
     }
 
     if (clinic && JSON.stringify(clinic) !== JSON.stringify(doctor.clinic)) {
-      updates.clinic = {
-        ...clinic,
-        imgs: existingImgs,
-      };
+      updates.clinic = { ...clinic, imgs: existingImgs };
     }
 
     if (Object.keys(updates).length === 0) {
@@ -230,10 +196,8 @@ export class DoctorService {
 
     Object.assign(doctor, updates);
 
-    const updatedDoctor = await this.doctorRepo.save(doctor);
-    if (!updatedDoctor) {
-      throw new ConflictException('Failed to update account data');
-    }
+    const updatedDoctor = await this.doctorProvider.save(doctor);
+    if (!updatedDoctor) throw new ConflictException('Failed to update account data');
 
     try {
       await this.mailService.sendUpdateDoctorEmail(
@@ -247,7 +211,7 @@ export class DoctorService {
         }`,
       );
     } catch (error) {
-      console.error('Error sending doctor signup email:', error);
+      console.error('Error sending doctor update email:', error);
     }
 
     return {
@@ -258,14 +222,11 @@ export class DoctorService {
   }
 
   async verifyUpdatedEmail(data: { email: string; id: number }, res: Response) {
-    const doctor = await this.doctorRepo.findOne({
-      where: { email: data.email },
-    });
+    const doctor = await this.doctorProvider.findByEmail(data.email);
     if (!doctor) {
       return res.status(404).send('Doctor not found');
-    } else {
-      res.send(DoctorVerifyUpdateEmail(doctor.fullName.fname + ' ' + doctor.fullName.lname));
     }
+    res.send(DoctorVerifyUpdateEmail(doctor.fullName.fname + ' ' + doctor.fullName.lname));
   }
 
   async verifyDoctorEmailAfterUpdateOtp(data: {
@@ -273,18 +234,13 @@ export class DoctorService {
     email: string;
     id: number;
   }): Promise<DoctorResponseType> {
-    const doctor = await this.doctorRepo.findOne({
-      where: { email: data.email, id: data.id },
-    });
-    if (!doctor) {
-      throw new NotFoundException('Doctor not found');
-    }
-    if (doctor.otp !== data.otp) {
-      throw new ConflictException('Invalid OTP');
-    }
+    const doctor = await this.doctorProvider.findByEmail(data.email);
+    if (!doctor || doctor.id !== data.id) throw new NotFoundException('Doctor not found');
+    if (doctor.otp !== data.otp) throw new ConflictException('Invalid OTP');
+
     doctor.isVerified = true;
     doctor.otp = '';
-    const updatedDoctor = await this.doctorRepo.save(doctor);
+    const updatedDoctor = await this.doctorProvider.save(doctor);
     if (!updatedDoctor) {
       throw new ConflictException('Failed to update doctor email verification status');
     }
@@ -296,16 +252,16 @@ export class DoctorService {
   }
 
   async doctorResetPasswordRequest(data: doctorProfileResetPasswordDto) {
-    const doctor = await this.doctorRepo.findOne({
-      where: { email: data.email },
-    });
+    const doctor = await this.doctorProvider.findByEmail(data.email);
     if (!doctor) throw new NotFoundException('Doctor not found');
     if (!doctor.isActive) throw new ConflictException('Doctor account is not active');
     if (!doctor.isVerified) throw new ConflictException('Doctor account is not verified');
+
     doctor.otp = this.otpService.generateComplexOtp(6);
-    const updatedDoctor = await this.doctorRepo.save(doctor);
+    const updatedDoctor = await this.doctorProvider.save(doctor);
     if (!updatedDoctor)
       throw new ConflictException('Something went wrong while updating doctor data');
+
     this.mailService.sendDoctorResetPasswordEmail(
       updatedDoctor.fullName.fname + ' ' + updatedDoctor.fullName.lname,
       updatedDoctor.email,
@@ -320,23 +276,18 @@ export class DoctorService {
   }
 
   async doctorResetPassword(data: doctorProfileResetPasswordDoDto) {
-    const doctor = await this.doctorRepo.findOne({
-      where: { email: data.email },
-      relations: ['credential'],
-    });
+    const doctor = await this.doctorProvider.findByEmailWithCredentials(data.email);
     if (!doctor) throw new NotFoundException('Doctor account not found!');
     if (!doctor.isActive) throw new ConflictException('Doctor account is not active');
     if (!doctor.isVerified) throw new ConflictException('Doctor account is not verified');
     if (data.otp !== doctor.otp) throw new ConflictException('Invalid OTP!');
     if (!doctor.credential) throw new ConflictException('Doctor credentials not found!');
 
-    // Hash and update the new password
     doctor.credential.password = await this.bcryptService.bcryptHashingUtil(data.password);
     doctor.otp = '';
 
-    // Save the updated credential and doctor
     await this.credintialService.saveDoctorCredential(doctor.credential);
-    await this.doctorRepo.save(doctor);
+    await this.doctorProvider.save(doctor);
 
     return {
       message: 'Password reset successfully',
@@ -345,17 +296,18 @@ export class DoctorService {
       isVerified: doctor.isVerified,
     };
   }
+
   async doctorProfileChooseCategory(data: doctorProfileChooseCategoryDto, id: number) {
     const category = await this.categoryService.findOneCategoryForDoctor(+data?.categoryId);
     if (!category) throw new NotFoundException('Category not found!!');
 
-    const doctor = await this.doctorRepo.findOne({ where: { id } });
+    const doctor = await this.doctorProvider.findById(id);
     if (!doctor) throw new NotFoundException('Doctor account not found!!');
 
     doctor.category = category;
 
     try {
-      const savedDoctor = await this.doctorRepo.save(doctor);
+      const savedDoctor = await this.doctorProvider.save(doctor);
       return savedDoctor;
     } catch (error) {
       throw new ConflictException("Failed to update doctor's category.");
@@ -363,20 +315,19 @@ export class DoctorService {
   }
 
   async doctorProfileUpdatePassword(data: updatePasswordDto, id: number): Promise<DoctorEntity> {
-    const doctor = await this.doctorRepo.findOne({
-      where: { id },
-      relations: ['credential'],
-    });
+    const doctor = await this.doctorProvider.findByIdWithCredentials(id);
     if (!doctor) throw new NotFoundException('Doctor account not found!!');
+
     const { oldPassword, password } = data;
     const isPassvalid = await this.bcryptService.bcryptCompareUtil(
       oldPassword,
       doctor.credential.password,
     );
     if (!isPassvalid) throw new ConflictException('Old password not match!!');
+
     doctor.credential.password = await this.bcryptService.bcryptHashingUtil(password);
     try {
-      const savedDoctor = await this.doctorRepo.save(doctor);
+      const savedDoctor = await this.doctorProvider.save(doctor);
       return savedDoctor;
     } catch (error) {
       throw new ConflictException("Failed to update doctor's password");
@@ -384,15 +335,11 @@ export class DoctorService {
   }
 
   async doctorProfileView(viewedDoctorId: number, data: DoctorProfileViewerDto) {
-    const doctor = await this.doctorRepo.findOne({
-      where: { id: viewedDoctorId },
-    });
+    const doctor = await this.doctorProvider.findById(viewedDoctorId);
     if (!doctor) throw new ConflictException('Account not found!!');
 
-    // if viewer id
-    const viewerDoctor = data.viewerId
-      ? await this.doctorRepo.findOne({ where: { id: data.viewerId } })
-      : null;
+    const viewerDoctor = data.viewerId ? await this.doctorProvider.findById(data.viewerId) : null;
+
     const readyViewerData = {
       ip: data.viewerIp.toString(),
       viewer: viewerDoctor ?? null,
@@ -407,23 +354,23 @@ export class DoctorService {
 
     if (!isViewerExist) {
       doctor.views = [...(doctor.views || []), readyViewerData];
-      await this.doctorRepo.save(doctor);
+      await this.doctorProvider.save(doctor);
     }
   }
 
   async getMyData(id: number): Promise<DoctorEntity> {
-    const doctor = await this.doctorRepo.findOne({ where: { id } });
+    const doctor = await this.doctorProvider.findById(id);
     if (!doctor) throw new ConflictException('Something went wrong, Account not found!!');
     return doctor;
   }
 
   async clincAndWorkingDays(data: ClincAndWorkingDaysDto, doctorId: number) {
-    const doctor = await this.doctorRepo.findOne({ where: { id: doctorId } });
+    const doctor = await this.doctorProvider.findById(doctorId);
     if (!doctor) throw new NotFoundException('Cannot found doctor account.');
 
     const { clinic, workingHours } = data;
 
-    return await this.doctorRepo.manager.transaction(async (manager) => {
+    return await this.doctorProvider.executeTransaction(async (manager) => {
       doctor.clinic = {
         name: clinic.name || doctor.clinic.name,
         description: clinic.description || doctor.clinic.description,
@@ -438,23 +385,12 @@ export class DoctorService {
 
       const savedDoctor = await manager.save(doctor);
 
-      await manager.delete(this.workingHoursRepo.target, {
-        doctor: savedDoctor,
-      });
+      await this.doctorProvider.deleteWorkingHours(manager, savedDoctor);
 
-      const addWorkingHours = await Promise.all(
-        workingHours.map((wh) =>
-          manager.save(
-            this.workingHoursRepo.create({
-              day: wh.day,
-              time: {
-                from: wh.time.from,
-                to: wh.time.to,
-              },
-              doctor: savedDoctor,
-            }),
-          ),
-        ),
+      const addWorkingHours = await this.doctorProvider.createWorkingHours(
+        manager,
+        workingHours,
+        savedDoctor,
       );
 
       if (!addWorkingHours || addWorkingHours.length === 0) {
@@ -469,56 +405,24 @@ export class DoctorService {
   }
 
   async getAllDoctors(queryObj: GetDoctorQueriesDto) {
-    const qb = this.doctorRepo.createQueryBuilder('doctor');
-
-    if (queryObj.governorate) {
-      qb.andWhere("doctor.address ->> 'governorate' = :gov", {
-        gov: queryObj.governorate,
-      });
-    }
-    if (queryObj.center) {
-      qb.andWhere("doctor.address ->> 'center' = :center", {
-        center: queryObj.center,
-      });
-    }
-    if (queryObj.price) {
-      const { from, to } = queryObj.price;
-      if (from !== undefined) {
-        qb.andWhere("(doctor.clinic ->> 'price')::numeric >= :from", { from });
-      }
-      if (to !== undefined) {
-        qb.andWhere("(doctor.clinic ->> 'price')::numeric <= :to", { to });
-      }
-    }
-
-    if (queryObj.search) {
-      qb.andWhere(
-        `(doctor.fullName ->> 'fname' ILIKE :search OR doctor.fullName ->> 'lname' ILIKE :search OR doctor.phone ILIKE :search OR doctor.email ILIKE :search)`,
-        { search: `%${queryObj.search}%` },
-      );
-    }
-
-    if (queryObj.orderKey && queryObj.orderValue) {
-      qb.orderBy(`doctor.${queryObj.orderKey}`, queryObj.orderValue as 'ASC' | 'DESC');
-    }
-
-    const page = queryObj.page ? Number(queryObj.page) : 1;
-    const limit = queryObj.limit ? Number(queryObj.limit) : 10;
-
-    return paginate<DoctorEntity>(qb, { page, limit, route: '/doctor' });
+    return await this.doctorProvider.getAllDoctors(queryObj);
   }
 
   async handleBlockDoctor(idNo: number) {
     if (!idNo) throw new BadRequestException('Doctor id not found.');
 
-    const doctor = await this.doctorRepo.findOne({ where: { id: idNo } });
+    const doctor = await this.doctorProvider.findById(idNo);
     if (!doctor) throw new ConflictException('Doctor not found.');
 
     doctor.isActive = !doctor.isActive;
-    await this.doctorRepo.save(doctor);
+    await this.doctorProvider.save(doctor);
 
     return {
       isActive: Boolean(doctor.isActive),
     };
+  }
+
+  public async uploadPaymentImage(file: Express.Multer.File, doctorId: number) {
+    // Implementation needed
   }
 }
