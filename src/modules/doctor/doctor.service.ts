@@ -28,6 +28,7 @@ import { DoctorResponseType } from '../../shared/type/doctor.type';
 import { JwtUtilService } from '../../common/utils/jwt.utils';
 import { ConfigService } from '@nestjs/config';
 import type { Response } from 'express';
+import { Express } from 'express';
 import DoctorVerifyUpdateEmail from '../../common/pages/doctor.verifyUpdateEmail';
 import { BcryptUtilService } from '../../common/utils/bcrypt.util';
 import { CategoryService } from '../category/category.service';
