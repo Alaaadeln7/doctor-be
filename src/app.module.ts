@@ -12,6 +12,7 @@ import { CommonModule } from './modules/common/common.module';
 import { LocationModule } from './modules/location/location.module';
 import { WorkinHoursModule } from './modules/workin-hours/workin-hours.module';
 import { MailModule } from './mail/mail.module';
+import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { MailModule } from './mail/mail.module';
     CommonModule,
     LocationModule,
     WorkinHoursModule,
+    SubscriptionsModule,
   ],
 })
 export class AppModule {}

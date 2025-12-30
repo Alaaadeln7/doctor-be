@@ -13,6 +13,7 @@ import { ReservationEntity } from '../shared/entities/reservations.entity';
 import { WorkingHoursEntity } from '../shared/entities/workinHours.entity';
 import { GovernorateEntity } from '../shared/entities/governorate.entity';
 import { CityEntity } from '../shared/entities/city.entity';
+import { Subscription } from '../subscriptions/entities/subscription.entity';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { CityEntity } from '../shared/entities/city.entity';
             CredentialEntity,
             GovernorateEntity,
             CityEntity,
+            Subscription,
           ],
           synchronize: true,
           logging: isDevelopment,
