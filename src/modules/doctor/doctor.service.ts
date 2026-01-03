@@ -443,4 +443,18 @@ export class DoctorService {
 
     return { success: true, url: uploadResult.url, doctorId };
   }
+
+  public async deleteDoctor(idNo: number) {
+    if (!idNo) throw new BadRequestException('Doctor id not found.');
+
+    const doctor = await this.doctorProvider.findById(idNo);
+    if (!doctor) throw new ConflictException('Doctor not found.');
+
+    doctor.isActive = !doctor.isActive;
+    await this.doctorProvider.save(doctor);
+
+    return {
+      isActive: Boolean(doctor.isActive),
+    };
+  }
 }

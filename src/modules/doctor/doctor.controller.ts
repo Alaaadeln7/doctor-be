@@ -3,6 +3,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -242,7 +243,14 @@ export class DoctorController {
   @ApiParam({ name: 'id', type: String })
   @ApiBearerAuth('access-token')
   async handleBlockDoctor(@Param('id') id: string): Promise<{ isActive: boolean }> {
-    const idNo = +id;
-    return this.doctorService.handleBlockDoctor(idNo);
+    return this.doctorService.handleBlockDoctor(+id);
+  }
+
+  @UseGuards(AuthGuard)
+  @Delete('/delete-doctor/:id')
+  @ApiParam({ name: 'id', type: String })
+  @ApiBearerAuth('access-token')
+  async deleteDoctor(@Param('id') id: string): Promise<{ isActive: boolean }> {
+    return this.doctorService.deleteDoctor(+id);
   }
 }
