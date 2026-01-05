@@ -14,13 +14,13 @@ import {
   UseInterceptors,
   Req,
 } from '@nestjs/common';
-import { addPlanDto, updatePlanDto } from '../..//shared/dtos/plan.dto';
+import { addPlanDto, updatePlanDto } from '../../shared/dtos/plan.dto';
 import { PlanService } from './plan.service';
 import { ApiBearerAuth, ApiHeader, ApiParam, ApiQuery } from '@nestjs/swagger';
-import { PlanEntity } from '../..//shared/entities/plans.entity';
+import { PlanEntity } from '../../shared/entities/plans.entity';
 import { Pagination } from 'nestjs-typeorm-paginate';
-import { Public } from '../..//common/decorators/public.decorator';
-import LocalizationInterceptor from '../..//common/interceptors/localization.interceptor';
+import { Public } from '../../common/decorators/public.decorator';
+import LocalizationInterceptor from '../../common/interceptors/localization.interceptor';
 
 @Controller('plan')
 export class PlanController {

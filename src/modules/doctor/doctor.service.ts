@@ -457,4 +457,8 @@ export class DoctorService {
       isActive: Boolean(doctor.isActive),
     };
   }
+
+  public async getDoctorFiltrationInfo() {
+    return this.doctorProvider.getDoctorFiltrationInfo();
+  }
 }

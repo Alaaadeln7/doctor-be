@@ -128,4 +128,23 @@ export class DoctorProvider {
       ),
     );
   }
+
+  async getDoctorFiltrationInfo() {
+    const qb = this.doctorRepo.createQueryBuilder('doctor');
+
+    const result = await qb
+      .select("MIN((doctor.clinic->>'price')::numeric)", 'minPrice')
+      .addSelect("MAX((doctor.clinic->>'price')::numeric)", 'maxPrice')
+      .addSelect(
+        "ARRAY_AGG(DISTINCT doctor.clinic->>'paymentWay') FILTER (WHERE doctor.clinic->>'paymentWay' IS NOT NULL)",
+        'paymentWays',
+      )
+      .getRawOne();
+
+    return {
+      minPrice: Number(result.minPrice) || 0,
+      maxPrice: Number(result.maxPrice) || 0,
+      paymentWays: result.paymentWays || [],
+    };
+  }
 }

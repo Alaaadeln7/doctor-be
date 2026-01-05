@@ -42,6 +42,8 @@ import {
   ApiQuery,
   ApiConsumes,
   ApiBody,
+  ApiOperation,
+  ApiResponse,
 } from '@nestjs/swagger';
 import { JwtUtilService } from '../../common/utils/jwt.utils';
 import type { Request, Response } from 'express';
@@ -252,5 +254,29 @@ export class DoctorController {
   @ApiBearerAuth('access-token')
   async deleteDoctor(@Param('id') id: string): Promise<{ isActive: boolean }> {
     return this.doctorService.deleteDoctor(+id);
+  }
+
+  @Get('/filters-info')
+  @UseGuards(AuthGuard)
+  @Public()
+  @ApiOperation({
+    summary: 'Get doctor filtration info like min price, max price and payment ways',
+  })
+  @ApiResponse({
+    status: 200,
+    schema: {
+      type: 'object',
+      properties: {
+        minPrice: { type: 'number', example: 100 },
+        maxPrice: { type: 'number', example: 500 },
+        paymentWays: {
+          type: 'array',
+          items: { type: 'string', example: 'cash' },
+        },
+      },
+    },
+  })
+  async getDoctorFiltrationInfo() {
+    return this.doctorService.getDoctorFiltrationInfo();
   }
 }
