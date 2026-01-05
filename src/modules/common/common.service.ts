@@ -1,13 +1,7 @@
-/* eslint-disable */
-
 import { BadRequestException, ConflictException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { OtpUtilService } from '../..//common/utils/otp.util';
-import {
-  ContactUsDto,
-  ResendOtpCodeDto,
-  ResendOtpResponseDto,
-} from '../..//shared/dtos/common.dto';
+import { ResendOtpCodeDto, ResendOtpResponseDto } from '../..//shared/dtos/common.dto';
 import { AdminEntity } from '../../shared/entities/admins.entity';
 import { DoctorEntity } from '../../shared/entities/doctors.entity';
 import { Repository } from 'typeorm';
@@ -66,16 +60,6 @@ export class CommonService {
       categories,
       governorates,
     };
-  }
-
-  async contactUs(data: ContactUsDto) {
-    try {
-      await this.mailService.sendContactUsEmail(data.name, data.email, data.message);
-    } catch (error) {
-      console.log(error);
-      throw new BadRequestException('Something went wrong!!');
-    }
-    return null;
   }
 
   async getDashboardAnalytics() {

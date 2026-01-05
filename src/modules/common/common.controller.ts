@@ -1,12 +1,6 @@
-/* eslint-disable */
-
 import { Body, Controller, Get, HttpCode, Post } from '@nestjs/common';
 import { Public } from '../..//common/decorators/public.decorator';
-import {
-  ContactUsDto,
-  ResendOtpCodeDto,
-  ResendOtpResponseDto,
-} from '../..//shared/dtos/common.dto';
+import { ResendOtpCodeDto, ResendOtpResponseDto } from '../..//shared/dtos/common.dto';
 import { CommonService } from './common.service';
 import { ApiBearerAuth } from '@nestjs/swagger';
 
@@ -26,13 +20,6 @@ export class CommonController {
   @HttpCode(200)
   getSignupEssentials() {
     return this.commonService.createNewAccountEssentials();
-  }
-
-  @Post('contact-us')
-  @Public()
-  @HttpCode(200)
-  async contactUs(@Body() data: ContactUsDto) {
-    return this.commonService.contactUs(data);
   }
 
   @Get('analytics')

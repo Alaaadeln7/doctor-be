@@ -1,14 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsEmail,
-  IsIn,
-  IsNotEmpty,
-  IsOptional,
-  IsPhoneNumber,
-  IsString,
-  isString,
-  MinLength,
-} from 'class-validator';
+import { IsEmail, IsIn, IsNotEmpty, IsOptional, IsPhoneNumber } from 'class-validator';
 
 type ModelType = 'doctor' | 'admin';
 export class ResendOtpCodeDto {
@@ -46,37 +37,4 @@ export class ResendOtpCodeDto {
 export class ResendOtpResponseDto {
   name: string;
   email: string;
-}
-
-export class ContactUsDto {
-  @IsString()
-  @MinLength(3)
-  @IsNotEmpty()
-  @ApiProperty({
-    name: 'name',
-    description: 'your name with min 3 chars',
-    type: 'string',
-    required: true,
-  })
-  name: string;
-
-  @IsEmail()
-  @IsNotEmpty()
-  @ApiProperty({
-    name: 'email',
-    description: 'your email',
-    type: 'string',
-    required: true,
-  })
-  email: string;
-
-  @ApiProperty({
-    name: 'message',
-    description: 'your message',
-    type: 'string',
-    required: true,
-  })
-  @IsString()
-  @IsNotEmpty()
-  message: string;
 }
