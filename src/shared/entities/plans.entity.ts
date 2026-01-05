@@ -26,17 +26,14 @@ export class PlanEntity {
     ar: string;
   };
 
-  @Column({ type: 'jsonb', nullable: false })
-  price: {
-    en: number;
-    ar: number;
-  };
+  @Column({ type: 'int', nullable: false })
+  monthlyPrice: number;
+
+  @Column({ type: 'int', nullable: false })
+  yearlyPrice: number;
 
   @Column({ type: 'int', nullable: false })
   lsUpBy: number;
-
-  @Column({ type: 'varchar', nullable: true })
-  type: string;
 
   @CreateDateColumn()
   createdAt: Date;

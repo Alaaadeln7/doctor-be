@@ -26,18 +26,6 @@ class MultiLangText {
   ar: string;
 }
 
-class MultiLangPrice {
-  @ApiProperty({ example: 100 })
-  @IsNumber()
-  @Min(0)
-  en: number;
-
-  @ApiProperty({ example: 100 })
-  @IsNumber()
-  @Min(0)
-  ar: number;
-}
-
 export enum PlanType {
   MONTHLY = 'monthly',
   YEARLY = 'yearly',
@@ -63,10 +51,15 @@ export class addPlanDto {
   @IsEnum(PlanType, { message: 'Type must be either monthly or yearly' })
   type: PlanType;
 
-  @ApiProperty({ type: MultiLangPrice })
-  @ValidateNested()
-  @Type(() => MultiLangPrice)
-  price: MultiLangPrice;
+  @ApiProperty({ type: Number })
+  @IsNumber()
+  @Min(0)
+  monthlyPrice: number;
+
+  @ApiProperty({ type: Number })
+  @IsNumber()
+  @Min(0)
+  yearlyPrice: number;
 }
 
 export class updatePlanDto {
@@ -80,8 +73,13 @@ export class updatePlanDto {
   @Type(() => MultiLangText)
   description: MultiLangText;
 
-  @ApiProperty({ type: MultiLangPrice })
-  @ValidateNested()
-  @Type(() => MultiLangPrice)
-  price: MultiLangPrice;
+  @ApiProperty({ type: Number })
+  @IsNumber()
+  @Min(0)
+  monthlyPrice: number;
+
+  @ApiProperty({ type: Number })
+  @IsNumber()
+  @Min(0)
+  yearlyPrice: number;
 }

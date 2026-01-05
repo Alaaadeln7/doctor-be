@@ -29,10 +29,6 @@ export class PlanController {
   @Post()
   @ApiBearerAuth('access-token')
   addPlan(@Body() data: addPlanDto, @Req() req: Request): Promise<PlanEntity> {
-    const { price } = data;
-    if (price.en !== price.ar) {
-      throw new BadRequestException('price and price_ar should be same');
-    }
     return this.planService.addPlan({ ...data, lsUpBy: req['user']?.id });
   }
 
@@ -45,9 +41,6 @@ export class PlanController {
     @Body() data: updatePlanDto,
     @Req() req: Request,
   ): Promise<PlanEntity> {
-    if (data.price?.en !== data.price?.ar) {
-      throw new BadRequestException('price and price_ar should be same');
-    }
     return this.planService.updatePlan({ ...data, lsUpBy: req['user']?.id }, +id);
   }
 
