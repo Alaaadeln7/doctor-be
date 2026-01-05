@@ -15,13 +15,13 @@ export class PlanService {
   ) {}
 
   addPlan(data: addPlanDto & { lsUpBy: number }): Promise<PlanEntity> {
-    const { title, description, price, lsUpBy, type } = data;
+    const { title, description, monthlyPrice, yearlyPrice, lsUpBy } = data;
     const addNewPlan = this.planRepo.create({
       title,
       description,
-      price,
+      monthlyPrice,
+      yearlyPrice,
       lsUpBy,
-      type,
     });
     return this.planRepo.save(addNewPlan);
   }
@@ -180,7 +180,8 @@ export class PlanService {
         id: plan.id,
         title: plan.title,
         description: plan.description,
-        price: plan.price,
+        monthlyPrice: plan.monthlyPrice,
+        yearlyPrice: plan.yearlyPrice,
       };
     }
     const plan = await this.planRepo
