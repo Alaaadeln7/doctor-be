@@ -60,7 +60,7 @@ export class PlanController {
   }
 
   @Public()
-  @Get()
+  @Get('/get-all-plans')
   @UseInterceptors(LocalizationInterceptor)
   @HttpCode(200)
   @ApiQuery({ name: 'page', required: true, type: Number })
@@ -72,19 +72,9 @@ export class PlanController {
   })
   getAllPlans(
     @Query() query: { page: number; limit: number },
-    @Query('title') title: string,
-    @Query('price') price: string,
-    @Query('id') id: string,
     @Req() req: Request,
   ): Promise<Pagination<PlanEntity>> {
-    return this.planService.getAllPlans(
-      +query.page,
-      +query.limit,
-      req['localeCode'],
-      title,
-      price,
-      id,
-    );
+    return this.planService.getAllPlans(+query.page, +query.limit, req['localeCode']);
   }
 
   @Public()

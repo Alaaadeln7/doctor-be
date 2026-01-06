@@ -47,95 +47,33 @@ export class PlanService {
     return this.planRepo.clear();
   }
 
-  async getAllPlans(
-    page: number,
-    limit: number,
-    localeCode: string,
-    title: string,
-    price: string,
-    id: string,
-  ): Promise<Pagination<any>> {
+  async getAllPlans(page: number, limit: number, localeCode: string): Promise<Pagination<any>> {
     if (!localeCode) {
       const plansQuery = this.planRepo
         .createQueryBuilder('plan')
-        .select(['plan.id', 'plan.title', 'plan.description', 'plan.price'])
+        .select([
+          'plan.id',
+          'plan.title',
+          'plan.description',
+          'plan.monthlyPrice',
+          'plan.yearlyPrice',
+        ])
         .orderBy('plan.id', 'ASC');
-
-      if (id) {
-        plansQuery.andWhere('plan.id = :id', { id });
-      }
-      if (title) {
-        // Search in both en and ar fields
-        plansQuery.andWhere("(plan.title->>'en' ILIKE :title OR plan.title->>'ar' ILIKE :title)", {
-          title: `%${title}%`,
-        });
-      }
-      if (price) {
-        // Search in both en and ar fields for price
-        const numPrice = parseFloat(price);
-        plansQuery.andWhere(
-          "((plan.price->>'en')::numeric = :price OR (plan.price->>'ar')::numeric = :price)",
-          { price: numPrice },
-        );
-      }
 
       return paginate<PlanEntity>(plansQuery, { page, limit, route: '/plan' });
     }
-
-    // ------------------------------
-    // CASE 2: localeCode exists → use JSONB fields
-    // ------------------------------
 
     const queryBuilder = this.planRepo
       .createQueryBuilder('plan')
       .select('plan.id', 'id')
       .addSelect(`plan.title ->> :localeCode`, 'title')
       .addSelect(`plan.description ->> :localeCode`, 'description')
-      .addSelect(`plan.price ->> :localeCode`, 'price')
+      .addSelect('plan.monthlyPrice', 'monthlyPrice')
+      .addSelect('plan.yearlyPrice', 'yearlyPrice')
       .setParameters({ localeCode });
 
-    // Filters
-    if (id) {
-      queryBuilder.andWhere('plan.id = :id', { id });
-    }
-    if (title) {
-      queryBuilder.andWhere(`(plan.title ->> :localeCode) ILIKE :title`, {
-        title: `%${title}%`,
-      });
-    }
-    if (price) {
-      // Cast to numeric for proper comparison
-      const numPrice = parseFloat(price);
-      queryBuilder.andWhere(`(plan.price ->> :localeCode)::numeric = :price`, {
-        price: numPrice,
-      });
-    }
-
-    // ------------------------------
-    // Count query (MUST match same filters)
-    // ------------------------------
     const countQuery = this.planRepo.createQueryBuilder('plan').select('COUNT(*)', 'count');
 
-    if (id) {
-      countQuery.andWhere('plan.id = :id', { id });
-    }
-    if (title) {
-      countQuery.andWhere(`(plan.title ->> :localeCode) ILIKE :title`, {
-        localeCode,
-        title: `%${title}%`,
-      });
-    }
-    if (price) {
-      const numPrice = parseFloat(price);
-      countQuery.andWhere(`(plan.price ->> :localeCode)::numeric = :price`, {
-        localeCode,
-        price: numPrice,
-      });
-    }
-
-    // ------------------------------
-    // Execute queries
-    // ------------------------------
     const [rawData, countResult] = await Promise.all([
       queryBuilder
         .offset((page - 1) * limit)
@@ -147,12 +85,12 @@ export class PlanService {
 
     const count = parseInt(countResult.count, 10);
 
-    // parse values
     const items = rawData.map((plan) => ({
       id: plan.id,
       title: plan.title,
       description: plan.description,
-      price: plan.price ? parseFloat(plan.price) : null,
+      monthlyPrice: plan.monthlyPrice,
+      yearlyPrice: plan.yearlyPrice,
     }));
 
     return {
@@ -168,40 +106,27 @@ export class PlanService {
   }
 
   async getOnePlan(id: number, localeCode: string): Promise<any> {
-    if (!localeCode) {
-      const plan = await this.planRepo.findOneBy({ id });
-      if (!plan) {
-        throw new NotFoundException('Plan not found');
-      }
+    const plan = await this.planRepo.findOneBy({ id });
+    if (!plan) {
+      throw new NotFoundException('Plan not found');
+    }
+
+    if (localeCode) {
       return {
         id: plan.id,
-        title: plan.title,
-        description: plan.description,
+        title: plan.title[localeCode],
+        description: plan.description[localeCode],
         monthlyPrice: plan.monthlyPrice,
         yearlyPrice: plan.yearlyPrice,
       };
-    }
-    const plan = await this.planRepo
-      .createQueryBuilder('plan')
-      .select([
-        'plan.id AS id',
-        `plan.title ->> :localeCode AS title`,
-        `plan.description ->> :localeCode AS description`,
-        `plan.price ->> :localeCode AS price`,
-      ])
-      .where('plan.id = :id', { id })
-      .setParameters({ localeCode })
-      .getRawOne();
-
-    if (!plan) {
-      throw new NotFoundException('Plan not found');
     }
 
     return {
       id: plan.id,
       title: plan.title,
       description: plan.description,
-      price: parseFloat(plan.price),
+      monthlyPrice: plan.monthlyPrice,
+      yearlyPrice: plan.yearlyPrice,
     };
   }
 
