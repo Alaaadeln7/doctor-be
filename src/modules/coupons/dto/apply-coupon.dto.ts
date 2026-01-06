@@ -1,7 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsEnum, IsInt, IsNotEmpty, IsOptional, IsString, Min } from 'class-validator';
 
-export enum SubscriptionType {
+export enum PlanType {
   MONTHLY = 'monthly',
   YEARLY = 'yearly',
 }
@@ -17,9 +17,9 @@ export class ApplyCouponDto {
   @Min(1)
   planId: number;
 
-  @ApiProperty({ enum: SubscriptionType, example: SubscriptionType.MONTHLY })
-  @IsEnum(SubscriptionType)
-  type: SubscriptionType;
+  @ApiProperty({ enum: PlanType, example: PlanType.MONTHLY })
+  @IsEnum(PlanType)
+  type: PlanType;
 
   @ApiPropertyOptional({ example: 1 })
   @IsOptional()

@@ -26,13 +26,13 @@ export class PlanEntity {
     ar: string;
   };
 
-  @Column({ type: 'int', nullable: true })
+  @Column({ type: 'int', nullable: false })
   monthlyPrice: number;
 
-  @Column({ type: 'int', nullable: true })
+  @Column({ type: 'int', nullable: false })
   yearlyPrice: number;
 
-  @Column({ type: 'int', nullable: true })
+  @Column({ type: 'int', nullable: false })
   lsUpBy: number;
 
   @CreateDateColumn()

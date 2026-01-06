@@ -11,7 +11,7 @@ import { CreateCouponDto } from './dto/create-coupon.dto';
 import { Coupon, DiscountType } from './entities/coupon.entity';
 import { DoctorEntity } from '../../shared/entities/doctors.entity';
 import { PlanEntity } from '../../shared/entities/plans.entity';
-import { SubscriptionType } from './dto/apply-coupon.dto';
+import { PlanType } from './dto/apply-coupon.dto';
 
 @Injectable()
 export class CouponsService {
@@ -107,22 +107,18 @@ export class CouponsService {
       throw new NotFoundException('Invalid or inactive coupon code');
     }
 
-    // If coupon is doctor-specific, check if it matches the current doctor context (if applicable)
     if (coupon.doctor && doctorId && coupon.doctor.id !== doctorId) {
       throw new BadRequestException('This coupon is not valid for this doctor');
     }
 
-    // Check expiry
     if (coupon.expiryDate && new Date() > new Date(coupon.expiryDate)) {
       throw new BadRequestException('Coupon has expired');
     }
 
-    // Check usage limit
     if (coupon.usageLimit && coupon.usageCount >= coupon.usageLimit) {
       throw new BadRequestException('Coupon usage limit reached');
     }
 
-    // Check minimum order value
     if (orderValue < coupon.minOrderValue) {
       throw new BadRequestException(
         `Minimum order value of ${coupon.minOrderValue} required to use this coupon`,
@@ -138,7 +134,7 @@ export class CouponsService {
   async applyCouponToPlan(
     code: string,
     planId: number,
-    type: SubscriptionType,
+    type: PlanType,
     doctorId?: number,
   ): Promise<{ originalPrice: number; discountedPrice: number; discountAmount: number }> {
     const plan = await this.planRepository.findOne({ where: { id: planId } });
@@ -146,7 +142,7 @@ export class CouponsService {
       throw new NotFoundException(`Plan with ID ${planId} not found`);
     }
 
-    const originalPrice = type === SubscriptionType.MONTHLY ? plan.monthlyPrice : plan.yearlyPrice;
+    const originalPrice = type === PlanType.MONTHLY ? plan.monthlyPrice : plan.yearlyPrice;
 
     const coupon = await this.validateCoupon(code, originalPrice, doctorId);
     const discountAmount = this.calculateDiscount(coupon, originalPrice);

@@ -3,11 +3,13 @@
 
 
 ###
-POST {{baseUrl}}/create
+POST {{baseUrl}}/validate
 Content-Type: {{contentType}}
 
 {
-  "doctorId":1,
+  'doctorId':1,
+  'code':'123',
+  'orderValue':100
 }
 
 
