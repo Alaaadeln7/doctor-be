@@ -60,7 +60,7 @@ export class PlanController {
   }
 
   @Public()
-  @Get('/get-all-plans')
+  @Get()
   @UseInterceptors(LocalizationInterceptor)
   @HttpCode(200)
   @ApiQuery({ name: 'page', required: true, type: Number })

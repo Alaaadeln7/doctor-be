@@ -39,7 +39,6 @@ export class FileService {
       );
     }
 
-    // If no keepFiles, replace all existing files with new ones
     if ((!keepFiles || keepFiles.length === 0) && files && files.length > 0) {
       const oldPublicIds = doctor.clinic.imgs.map((img) => img.public_id);
       const replacedFiles = await this.storageService.replaceFiles(

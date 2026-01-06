@@ -17,7 +17,7 @@ import {
   DoctorProfileAuthFiles,
   DoctorProfileAuthUpdateFiles,
   DoctorProfileImgDto,
-} from '../..//shared/dtos/file.dto';
+} from '../../shared/dtos/file.dto';
 import { FileService } from './file.service';
 import type { Request } from 'express';
 import { Express } from 'express';
