@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
 import { UpdateSubscriptionDto } from './dto/update-subscription.dto';
 import { Subscription } from './entities/subscription.entity';
+import { paginate } from 'nestjs-typeorm-paginate';
 
 @Injectable()
 export class SubscriptionsService {
@@ -24,10 +25,14 @@ export class SubscriptionsService {
     };
   }
 
-  async findAll(): Promise<Subscription[]> {
-    return await this.subscriptionRepo.find({
-      relations: ['user', 'plan'],
-    });
+  async findAll(options: { page: number; limit: number } = { page: 1, limit: 10 }) {
+    const { page, limit } = options;
+    const qb = this.subscriptionRepo.createQueryBuilder('subscription');
+    qb.leftJoinAndSelect('subscription.user', 'user');
+    qb.leftJoinAndSelect('subscription.plan', 'plan');
+    qb.orderBy('subscription.createdAt', 'DESC');
+
+    return paginate<Subscription>(qb, { page, limit, route: '/subscriptions' });
   }
 
   async findOne(id: string): Promise<Subscription> {

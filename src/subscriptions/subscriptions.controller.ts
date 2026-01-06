@@ -9,6 +9,7 @@ import {
   HttpCode,
   HttpStatus,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -16,6 +17,7 @@ import {
   ApiResponse,
   ApiParam,
   ApiBearerAuth,
+  ApiQuery,
 } from '@nestjs/swagger';
 import { SubscriptionsService } from './subscriptions.service';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
@@ -44,9 +46,11 @@ export class SubscriptionsController {
   @ApiOperation({ summary: 'Get all subscriptions (Admin only)' })
   @ApiResponse({ status: 200, description: 'List of subscriptions', type: [Subscription] })
   @ApiResponse({ status: 403, description: 'Forbidden - Only admins can access this endpoint' })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
   @HttpCode(HttpStatus.OK)
-  async findAll(): Promise<Subscription[]> {
-    return await this.subscriptionsService.findAll();
+  async findAll(@Query('page') page = 1, @Query('limit') limit = 10) {
+    return await this.subscriptionsService.findAll({ page, limit });
   }
 
   @Get('user/:userId')
@@ -85,7 +89,11 @@ export class SubscriptionsController {
   @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Update a subscription' })
   @ApiParam({ name: 'id', type: Number, description: 'Subscription ID' })
-  @ApiResponse({ status: 200, description: 'Subscription updated successfully', type: Subscription })
+  @ApiResponse({
+    status: 200,
+    description: 'Subscription updated successfully',
+    type: Subscription,
+  })
   @ApiResponse({ status: 404, description: 'Subscription not found' })
   @HttpCode(HttpStatus.OK)
   async update(

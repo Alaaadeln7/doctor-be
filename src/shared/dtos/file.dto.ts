@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsOptional } from 'class-validator';
 import { Binary } from 'typeorm';
 
 // doctor
@@ -10,8 +10,27 @@ export class DoctorProfileImgDto {
     name: 'img',
     description: 'doctor profile image',
   })
-  @IsNotEmpty()
-  img: Binary;
+  @IsOptional()
+  img?: Binary;
+
+  @ApiProperty({
+    type: 'string',
+    name: 'favColor',
+    description: 'favorite color',
+    required: false,
+  })
+  @IsOptional()
+  favColor?: string;
+
+  @ApiProperty({
+    type: 'string',
+    format: 'binary',
+    name: 'backgroundImage',
+    description: 'background image',
+    required: false,
+  })
+  @IsOptional()
+  backgroundImage?: Binary;
 }
 
 export class DoctorProfileAuthFiles {

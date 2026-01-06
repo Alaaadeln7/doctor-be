@@ -6,10 +6,10 @@ import {
   Post,
   UseInterceptors,
   UploadedFiles,
-  UploadedFile,
   Req,
   HttpCode,
   Patch,
+  Body,
 } from '@nestjs/common';
 import { FileFieldsInterceptor, FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiBody, ApiConsumes } from '@nestjs/swagger';
@@ -51,16 +51,29 @@ export class FileController {
 
   @Patch('doctor/img')
   @HttpCode(200)
-  @UseInterceptors(FileInterceptor('img'))
+  @UseInterceptors(
+    FileFieldsInterceptor([
+      { name: 'img', maxCount: 1 },
+      { name: 'backgroundImage', maxCount: 1 },
+    ]),
+  )
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     description: 'doctor profile image, اضافه او تعديل الصوره الشخصيه للدكتور',
     type: DoctorProfileImgDto,
   })
   @ApiBearerAuth('access-token')
-  async uploadMyDoctorProfileImg(@Req() req, @UploadedFile() file: Express.Multer.File) {
+  async uploadMyDoctorProfileImg(
+    @Req() req,
+    @Body() body: DoctorProfileImgDto,
+    @UploadedFiles()
+    files: {
+      img?: Express.Multer.File[];
+      backgroundImage?: Express.Multer.File[];
+    },
+  ) {
     const doctorId = req['user']?.id;
-    return this.fileService.updateDoctorProfileImg(+doctorId, file);
+    return this.fileService.updateDoctorProfileImg(+doctorId, files, body.favColor);
   }
 
   @Patch('doctor/clinic')

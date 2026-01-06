@@ -39,8 +39,13 @@ export class DoctorEntity {
   @Column({ type: 'boolean', default: false })
   isDeleted: boolean;
 
-  @Column({ type: 'jsonb', nullable: true })
-  img: FileClass;
+  @Column({
+    type: 'varchar',
+    nullable: true,
+    default:
+      'https://res.cloudinary.com/djs3yabys/image/upload/v1767716324/general/general-img-defaultavatar.png-drs-am5e-drs-2026/1.png',
+  })
+  img: string;
 
   @Column({ type: 'jsonb', nullable: false })
   fullName: {
@@ -72,6 +77,17 @@ export class DoctorEntity {
 
   @Column({ type: 'varchar', nullable: true })
   paymentImage: string;
+
+  @Column({ type: 'varchar', nullable: true })
+  favColor: string;
+
+  @Column({
+    type: 'varchar',
+    nullable: true,
+    default:
+      'https://res.cloudinary.com/djs3yabys/image/upload/v1767716726/general/general-img-defaultbgdoctor.png-drs-9n0f-drs-2026/1.png',
+  })
+  backgroundImage: string;
 
   @Column({ type: 'jsonb', nullable: true })
   clinic: {

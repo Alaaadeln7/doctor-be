@@ -177,7 +177,6 @@ export class FileService {
           doctor.auth?.id?.fid,
       },
     };
-    // Ensure all files exist
     if (!doctorFiles.card || !doctorFiles.id.fid) {
       throw new BadRequestException('All auth files must be provided');
     }
@@ -196,25 +195,56 @@ export class FileService {
    * Update doctor's profile image.
    * Replaces the old image with the new one.
    */
-  async updateDoctorProfileImg(doctorId: number, file: Express.Multer.File) {
+  async updateDoctorProfileImg(
+    doctorId: number,
+    files: {
+      img?: Express.Multer.File[];
+      backgroundImage?: Express.Multer.File[];
+    },
+    favColor?: string,
+  ) {
     if (!doctorId) throw new BadRequestException('User not authenticated');
     const doctor = await this.doctorRepo.findOneBy({ id: doctorId });
     if (!doctor) throw new NotFoundException('Doctor profile not found');
-    if (!file) throw new BadRequestException('You must upload your profile img');
-    const { img } = doctor;
-    // Replace old image with new one
-    const replacedFiles = await this.storageService.replaceFiles([img?.public_id], 'doctors/img', [
-      file,
-    ]);
-    if (!replacedFiles || !replacedFiles[0].public_id)
-      throw new BadRequestException('File upload failed, please try again');
-    doctor.img = {
-      public_id: replacedFiles[0].public_id,
-      url: replacedFiles[0].url,
-    };
+
+    if (favColor !== undefined) {
+      doctor.favColor = favColor;
+    }
+
+    if (files.img?.length) {
+      const file = files.img[0];
+      const replacedFiles = await this.storageService.replaceFiles(
+        [doctor.img].filter(Boolean),
+        'doctors/img',
+        [file],
+      );
+      if (!replacedFiles || !replacedFiles[0].public_id) {
+        throw new BadRequestException('Profile image upload failed, please try again');
+      }
+      doctor.img = replacedFiles[0].url;
+    }
+
+    if (files.backgroundImage?.length) {
+      const file = files.backgroundImage[0];
+      const replacedFiles = await this.storageService.replaceFiles(
+        [doctor.backgroundImage].filter(Boolean),
+        'doctors/bg',
+        [file],
+      );
+      if (!replacedFiles || !replacedFiles[0].public_id) {
+        throw new BadRequestException('Background image upload failed, please try again');
+      }
+      doctor.backgroundImage = replacedFiles[0].url;
+    }
+
     const updatedDoctor = await this.doctorRepo.save(doctor);
     if (!updatedDoctor)
-      throw new BadRequestException('Failed to update your profile image, please try again later');
-    return { img: doctor.img };
+      throw new BadRequestException('Failed to update your profile, please try again later');
+
+    return {
+      img: doctor.img,
+      backgroundImage: doctor.backgroundImage,
+      favColor: doctor.favColor,
+    };
   }
 }
