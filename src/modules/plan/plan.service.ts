@@ -55,9 +55,6 @@ export class PlanService {
     price: string,
     id: string,
   ): Promise<Pagination<any>> {
-    // ------------------------------
-    // CASE 1: No localeCode → return normal fields
-    // ------------------------------
     if (!localeCode) {
       const plansQuery = this.planRepo
         .createQueryBuilder('plan')
@@ -211,7 +208,7 @@ export class PlanService {
   async getTheBasicPlan(): Promise<PlanEntity | false> {
     const plan = await this.planRepo
       .createQueryBuilder('plan')
-      .orderBy(`(plan.price ->> 'en')::numeric`, 'ASC')
+      .orderBy('plan.monthlyPrice', 'ASC')
       .limit(1)
       .getOne();
     if (!plan) return false;

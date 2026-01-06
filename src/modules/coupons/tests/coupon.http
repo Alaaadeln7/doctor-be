@@ -1,0 +1,13 @@
+@baseUrl = http://localhost:5000/coupons
+@contentType = application/json
+
+
+###
+POST {{baseUrl}}/create
+Content-Type: {{contentType}}
+
+{
+  "doctorId":1,
+}
+
+

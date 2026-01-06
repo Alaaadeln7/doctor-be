@@ -16,6 +16,7 @@ import { WorkingHoursEntity } from './workinHours.entity';
 import { AppointmentEntity } from './appointments.entity';
 import { CredentialEntity } from './credentials.entity';
 import { CategoryEntity } from './categoris.entity';
+import { Coupon } from '../../modules/coupons/entities/coupon.entity';
 
 export interface FileClass {
   public_id: string;
@@ -59,8 +60,8 @@ export class DoctorEntity {
     count: number;
   };
 
-  @Column({ type: 'jsonb', nullable: true })
-  discountCode: string;
+  @OneToOne(() => Coupon, (coupon) => coupon.doctor)
+  coupon: Coupon;
 
   @Column({ type: 'jsonb', nullable: true, default: () => "'[]'" })
   views: {

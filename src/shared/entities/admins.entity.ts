@@ -19,7 +19,7 @@ export class AdminEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ unique: true, length: 250, nullable: false, type: 'varchar' })
+  @Column({ length: 250, nullable: false, type: 'varchar' })
   name: string;
 
   @Column({ type: 'varchar', nullable: false, unique: true })

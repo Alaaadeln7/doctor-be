@@ -14,6 +14,7 @@ import { WorkingHoursEntity } from '../shared/entities/workinHours.entity';
 import { GovernorateEntity } from '../shared/entities/governorate.entity';
 import { CityEntity } from '../shared/entities/city.entity';
 import { Subscription } from '../subscriptions/entities/subscription.entity';
+import { Coupon } from '../modules/coupons/entities/coupon.entity';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { Subscription } from '../subscriptions/entities/subscription.entity';
             GovernorateEntity,
             CityEntity,
             Subscription,
+            Coupon,
           ],
           synchronize: true,
           logging: isDevelopment,
