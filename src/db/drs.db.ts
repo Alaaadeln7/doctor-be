@@ -15,6 +15,7 @@ import { GovernorateEntity } from '../shared/entities/governorate.entity';
 import { CityEntity } from '../shared/entities/city.entity';
 import { Subscription } from '../subscriptions/entities/subscription.entity';
 import { Coupon } from '../modules/coupons/entities/coupon.entity';
+import { ContactUs } from '../modules/contact-us/entities/contact-us.entity';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { Coupon } from '../modules/coupons/entities/coupon.entity';
             CityEntity,
             Subscription,
             Coupon,
+            ContactUs,
           ],
           synchronize: true,
           logging: isDevelopment,

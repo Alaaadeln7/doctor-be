@@ -18,13 +18,6 @@ export class ContactUsService {
     private readonly mailService: MailService,
   ) {}
 
-  /**
-   * Create a new contact us message
-   * @param createContactUsDto - Contact form data
-   * @returns Created contact message
-   * @throws BadRequestException if validation fails
-   * @throws InternalServerErrorException if database operation fails
-   */
   async create(createContactUsDto: CreateContactUsDto): Promise<ContactUs> {
     try {
       const sanitizedData = {
@@ -52,6 +45,7 @@ export class ContactUsService {
         throw new BadRequestException('Failed to save contact message. Please check your input.');
       }
 
+      console.error('Error creating contact message:', error);
       throw new InternalServerErrorException(
         'An unexpected error occurred while processing your request',
       );
