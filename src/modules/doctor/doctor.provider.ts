@@ -147,4 +147,19 @@ export class DoctorProvider {
       paymentWays: result.paymentWays || [],
     };
   }
+
+  async getBestDoctors() {
+    const qb = this.doctorRepo.createQueryBuilder('doctor');
+
+    return await qb
+      .leftJoinAndSelect('doctor.category', 'category')
+      .where('doctor.isActive = :isActive', { isActive: true })
+      .andWhere('doctor.isDeleted = :isDeleted', { isDeleted: false })
+      .andWhere('doctor.isVerified = :isVerified', { isVerified: true })
+      .addSelect("jsonb_array_length(COALESCE(doctor.views, '[]'::jsonb))", 'viewCount')
+      .orderBy('doctor.rating', 'DESC')
+      .addOrderBy("jsonb_array_length(COALESCE(doctor.views, '[]'::jsonb))", 'DESC')
+      .limit(4)
+      .getMany();
+  }
 }

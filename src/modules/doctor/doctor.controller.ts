@@ -256,6 +256,43 @@ export class DoctorController {
     return this.doctorService.deleteDoctor(+id);
   }
 
+  @Get('/best')
+  @Public()
+  @ApiOperation({
+    summary: 'Get the best 4 doctors based on reviews (rating) and views',
+    description: 'Returns top 4 doctors sorted by rating and view count',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Successfully retrieved the best 4 doctors',
+    schema: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          id: { type: 'number', example: 1 },
+          email: { type: 'string', example: 'doctor@example.com' },
+          phone: { type: 'string', example: '01012345678' },
+          fullName: {
+            type: 'object',
+            properties: {
+              fname: { type: 'string', example: 'John' },
+              lname: { type: 'string', example: 'Doe' },
+            },
+          },
+          rating: { type: 'number', example: 4.5 },
+          viewCount: { type: 'number', example: 150 },
+          img: { type: 'string', example: 'https://example.com/image.png' },
+          clinic: { type: 'object' },
+          category: { type: 'object' },
+        },
+      },
+    },
+  })
+  async getBestDoctors() {
+    return this.doctorService.getBestDoctors();
+  }
+
   @Get('/filters-info')
   @UseGuards(AuthGuard)
   @Public()

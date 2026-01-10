@@ -461,4 +461,12 @@ export class DoctorService {
   public async getDoctorFiltrationInfo() {
     return this.doctorProvider.getDoctorFiltrationInfo();
   }
+
+  public async getBestDoctors() {
+    const doctors = await this.doctorProvider.getBestDoctors();
+    return doctors.map((doctor) => ({
+      ...doctor,
+      viewCount: doctor.views ? doctor.views.length : 0,
+    }));
+  }
 }
