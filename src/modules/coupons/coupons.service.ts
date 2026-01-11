@@ -13,6 +13,8 @@ import { DoctorEntity } from '../../shared/entities/doctors.entity';
 import { PlanEntity } from '../../shared/entities/plans.entity';
 import { PlanType } from './dto/apply-coupon.dto';
 
+import { paginate } from 'nestjs-typeorm-paginate';
+
 @Injectable()
 export class CouponsService {
   constructor(
@@ -71,11 +73,13 @@ export class CouponsService {
     return await this.couponRepository.save(coupon);
   }
 
-  async findAll(): Promise<Coupon[]> {
-    return await this.couponRepository.find({
-      relations: ['doctor'],
-      order: { createdAt: 'DESC' },
-    });
+  async findAll(options: { page: number; limit: number } = { page: 1, limit: 10 }) {
+    const { page, limit } = options;
+    const qb = this.couponRepository.createQueryBuilder('coupon');
+    qb.leftJoinAndSelect('coupon.doctor', 'doctor');
+    qb.orderBy('coupon.createdAt', 'DESC');
+
+    return paginate<Coupon>(qb, { page, limit, route: '/coupons' });
   }
 
   async findOne(id: number): Promise<Coupon> {

@@ -373,7 +373,7 @@ export class DoctorService {
 
     const { clinic, workingHours } = data;
 
-    return await this.doctorProvider.executeTransaction(async (manager) => {
+    await this.doctorProvider.executeTransaction(async (manager) => {
       doctor.clinic = {
         name: clinic.name || doctor.clinic.name,
         description: clinic.description || doctor.clinic.description,
@@ -390,21 +390,34 @@ export class DoctorService {
 
       await this.doctorProvider.deleteWorkingHours(manager, savedDoctor);
 
+      const workingHoursEntities = workingHours.days.map((day) => ({
+        day,
+        time: {
+          from: workingHours.time.from,
+          to: workingHours.time.to,
+        },
+      }));
+
       const addWorkingHours = await this.doctorProvider.createWorkingHours(
         manager,
-        workingHours,
+        workingHoursEntities,
         savedDoctor,
       );
 
       if (!addWorkingHours || addWorkingHours.length === 0) {
         throw new ConflictException('Failed to add Clinic Working hours.');
       }
-
-      return {
-        doctor: savedDoctor,
-        workingHours: addWorkingHours,
-      };
     });
+
+    return {
+      workingHours: {
+        days: workingHours.days,
+        time: {
+          from: workingHours.time.from,
+          to: workingHours.time.to,
+        },
+      },
+    };
   }
 
   async getAllDoctors(queryObj: GetDoctorQueriesDto) {

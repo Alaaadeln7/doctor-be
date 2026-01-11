@@ -499,6 +499,37 @@ class ClincForWorkingHourDto {
   paymentWay: PaymentWay;
 }
 
+class TimeDto {
+  @ApiProperty({ example: '09:00' })
+  @IsString()
+  @IsNotEmpty()
+  from: string;
+
+  @ApiProperty({ example: '17:00' })
+  @IsString()
+  @IsNotEmpty()
+  to: string;
+}
+
+class WorkingHoursInputDto {
+  @ApiProperty({
+    type: [String],
+    example: ['monday', 'tuesday'],
+    required: true,
+  })
+  @IsString({ each: true })
+  @IsNotEmpty({ each: true })
+  days: string[];
+
+  @ApiProperty({
+    type: TimeDto,
+    required: true,
+  })
+  @ValidateNested()
+  @Type(() => TimeDto)
+  time: TimeDto;
+}
+
 export class ClincAndWorkingDaysDto {
   @ApiProperty({
     name: 'clinic',
@@ -510,11 +541,11 @@ export class ClincAndWorkingDaysDto {
 
   @ApiProperty({
     name: 'workingHours',
-    type: [AddWoringHourDto],
+    type: WorkingHoursInputDto,
   })
-  @ValidateNested({ each: true })
-  @Type(() => AddWoringHourDto)
-  workingHours: AddWoringHourDto[];
+  @ValidateNested()
+  @Type(() => WorkingHoursInputDto)
+  workingHours: WorkingHoursInputDto;
 }
 
 export enum orderKeyEnums {

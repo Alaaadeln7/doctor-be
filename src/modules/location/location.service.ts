@@ -1,5 +1,3 @@
-/* eslint-disable */
-
 import { Injectable, NotFoundException } from '@nestjs/common';
 
 import { InjectRepository } from '@nestjs/typeorm';
@@ -10,6 +8,8 @@ import { UpdateGovernorateDto } from './dtos/update.governorates.dto';
 import { CityEntity } from '../../shared/entities/city.entity';
 import { CreateCityDto } from './dtos/create-city.dto';
 import { UpdateCityDto } from './dtos/update-city.dto';
+import { paginate } from 'nestjs-typeorm-paginate';
+
 @Injectable()
 export class LocationService {
   constructor(
@@ -19,10 +19,12 @@ export class LocationService {
     private readonly cityRepo: Repository<CityEntity>,
   ) {}
 
-  async getAllGovernorates() {
-    const allGovernorates = await this.governorateRepo.find();
+  async getAllGovernorates(options: { page: number; limit: number } = { page: 1, limit: 10 }) {
+    const { page, limit } = options;
+    const qb = this.governorateRepo.createQueryBuilder('governorate');
+    qb.orderBy('governorate.id', 'ASC');
 
-    return allGovernorates;
+    return paginate<GovernorateEntity>(qb, { page, limit, route: '/location/governorates' });
   }
 
   async createNewGovernorate(governorateData: CreateGovernorateDto) {
@@ -38,9 +40,13 @@ export class LocationService {
     return this.governorateRepo.update(id, governorateData);
   }
 
-  async getAllCities() {
-    const allCities = await this.cityRepo.find();
-    return allCities;
+  async getAllCities(options: { page: number; limit: number } = { page: 1, limit: 10 }) {
+    const { page, limit } = options;
+    const qb = this.cityRepo.createQueryBuilder('city');
+    qb.leftJoinAndSelect('city.governorate', 'governorate');
+    qb.orderBy('city.id', 'ASC');
+
+    return paginate<CityEntity>(qb, { page, limit, route: '/location/cities' });
   }
 
   async createCity(createCityDto: CreateCityDto) {

@@ -57,9 +57,11 @@ export class CouponsController {
   @UseGuards(AdminGuard)
   @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Get all coupons (Admin only)' })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
   @ApiResponse({ status: 200, type: [Coupon] })
-  async findAll() {
-    return await this.couponsService.findAll();
+  async findAll(@Query('page') page = 1, @Query('limit') limit = 10) {
+    return await this.couponsService.findAll({ page, limit });
   }
 
   @Get('validate')

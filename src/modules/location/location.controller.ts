@@ -1,5 +1,14 @@
-/* eslint-disable */
-import { Body, Controller, Delete, Get, Param, Post, Put, ParseIntPipe } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  ParseIntPipe,
+  Query,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Public } from '../../common/decorators/public.decorator';
 import { LocationService } from './location.service';
@@ -17,8 +26,8 @@ export class LocationController {
 
   @Get('governorates')
   @Public()
-  getAllGovernorates() {
-    return this.locationService.getAllGovernorates();
+  getAllGovernorates(@Query('page') page = 1, @Query('limit') limit = 10) {
+    return this.locationService.getAllGovernorates({ page, limit });
   }
 
   @Post('governorates')
@@ -49,8 +58,8 @@ export class LocationController {
 
   @Get('cities')
   @Public()
-  getAllCities() {
-    return this.locationService.getAllCities();
+  getAllCities(@Query('page') page = 1, @Query('limit') limit = 10) {
+    return this.locationService.getAllCities({ page, limit });
   }
 
   @Post('cities')
