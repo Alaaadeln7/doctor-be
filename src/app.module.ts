@@ -12,7 +12,7 @@ import { CommonModule } from './modules/common/common.module';
 import { LocationModule } from './modules/location/location.module';
 import { WorkinHoursModule } from './modules/workin-hours/workin-hours.module';
 import { MailModule } from './mail/mail.module';
-import { SubscriptionsModule } from './subscriptions/subscriptions.module';
+import { SubscriptionsModule } from './modules/subscriptions/subscriptions.module';
 import { ContactUsModule } from './modules/contact-us/contact-us.module';
 import { CouponsModule } from './modules/coupons/coupons.module';
 

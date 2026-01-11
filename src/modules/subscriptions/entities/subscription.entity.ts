@@ -7,8 +7,8 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { DoctorEntity } from '../../shared/entities/doctors.entity';
-import { PlanEntity } from '../../shared/entities/plans.entity';
+import { DoctorEntity } from '../../../shared/entities/doctors.entity';
+import { PlanEntity } from '../../../shared/entities/plans.entity';
 
 @Entity('subscriptions')
 export class Subscription {

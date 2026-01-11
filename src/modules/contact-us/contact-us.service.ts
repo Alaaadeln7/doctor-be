@@ -53,17 +53,19 @@ export class ContactUsService {
   }
 
   /**
-   * Get all contact messages (Admin only)
-   * @returns Array of all contact messages ordered by creation date
+   * Get all contact messages with pagination (Admin only)
+   * @param options - Pagination options (page, limit)
+   * @returns Paginated array of contact messages ordered by creation date
    * @throws InternalServerErrorException if database operation fails
    */
-  async findAll(): Promise<ContactUs[]> {
+  async findAll(options: { page: number; limit: number } = { page: 1, limit: 10 }) {
     try {
-      const contactMessages = await this.contactUsRepository.find({
-        order: { createdAt: 'DESC' },
-      });
+      const { page, limit } = options;
+      const qb = this.contactUsRepository.createQueryBuilder('contact_us');
+      qb.orderBy('contact_us.createdAt', 'DESC');
 
-      return contactMessages;
+      const { paginate } = await import('nestjs-typeorm-paginate');
+      return paginate<ContactUs>(qb, { page, limit, route: '/contact-us' });
     } catch (error) {
       throw new InternalServerErrorException(`Failed to retrieve contact messages ${error}`);
     }

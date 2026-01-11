@@ -28,7 +28,6 @@ export class AdminGuard implements CanActivate {
       throw new ForbiddenException('User not authenticated');
     }
 
-    // Verify admin exists in database using id from token
     const admin = await this.adminRepo.findOne({
       where: { id: user.id },
     });
@@ -37,22 +36,14 @@ export class AdminGuard implements CanActivate {
       throw new ForbiddenException('Admin not found');
     }
 
-    // Check if admin is active
     if (!admin.isActive) {
       throw new ForbiddenException('Admin account is not active');
     }
 
-    // Verify the role from database matches admin role
     if (admin.role !== 'admin') {
       throw new ForbiddenException('Only admins can access this resource');
-    }
-
-    // Verify token email matches admin email (additional security check)
-    if (admin.email !== user.email) {
-      throw new ForbiddenException('Token does not match admin account');
     }
 
     return true;
   }
 }
-

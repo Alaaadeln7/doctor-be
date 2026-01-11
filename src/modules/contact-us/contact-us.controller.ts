@@ -11,8 +11,16 @@ import {
   ParseIntPipe,
   UsePipes,
   ValidationPipe,
+  Query,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiParam,
+  ApiBearerAuth,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import { ContactUsService } from './contact-us.service';
 import { CreateContactUsDto } from './dto/create-contact-us.dto';
@@ -59,11 +67,25 @@ export class ContactUsController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Get all contact us messages (Admin only)',
-    description: 'Retrieve all contact us messages. Only accessible by admins.',
+    description: 'Retrieve all contact us messages with pagination. Only accessible by admins.',
+  })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    description: 'Page number (default: 1)',
+    example: 1,
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Number of items per page (default: 10)',
+    example: 10,
   })
   @ApiResponse({
     status: 200,
-    description: 'List of all contact messages ordered by creation date (newest first)',
+    description: 'Paginated list of contact messages ordered by creation date (newest first)',
     type: [ContactUs],
   })
   @ApiResponse({
@@ -78,8 +100,8 @@ export class ContactUsController {
     status: 500,
     description: 'Internal server error',
   })
-  async findAll(): Promise<ContactUs[]> {
-    return await this.contactUsService.findAll();
+  async findAll(@Query('page') page = 1, @Query('limit') limit = 10) {
+    return await this.contactUsService.findAll({ page, limit });
   }
 
   @Get(':id')

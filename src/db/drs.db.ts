@@ -13,7 +13,7 @@ import { ReservationEntity } from '../shared/entities/reservations.entity';
 import { WorkingHoursEntity } from '../shared/entities/workinHours.entity';
 import { GovernorateEntity } from '../shared/entities/governorate.entity';
 import { CityEntity } from '../shared/entities/city.entity';
-import { Subscription } from '../subscriptions/entities/subscription.entity';
+import { Subscription } from '../modules/subscriptions/entities/subscription.entity';
 import { Coupon } from '../modules/coupons/entities/coupon.entity';
 import { ContactUs } from '../modules/contact-us/entities/contact-us.entity';
 

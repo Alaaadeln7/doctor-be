@@ -23,7 +23,7 @@ import { SubscriptionsService } from './subscriptions.service';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
 import { UpdateSubscriptionDto } from './dto/update-subscription.dto';
 import { Subscription } from './entities/subscription.entity';
-import { AdminGuard } from '../guards/admin.guard';
+import { AdminGuard } from '../../guards/admin.guard';
 
 @ApiTags('subscriptions')
 @Controller('subscriptions')
