@@ -68,13 +68,13 @@ export class LocationController {
     return this.locationService.createCity(dto);
   }
 
-  @Put(':id')
+  @Put('cities/:id')
   @Public()
   updateCity(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateCityDto) {
     return this.locationService.updateCity(id, dto);
   }
 
-  @Delete(':id')
+  @Delete('cities/:id')
   @Public()
   deleteCity(@Param('id', ParseIntPipe) id: number) {
     return this.locationService.deleteCity(id);
