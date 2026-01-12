@@ -240,7 +240,7 @@ export class DoctorController {
   }
 
   @UseGuards(AuthGuard)
-  @Delete('/delete-doctor/:id')
+  @Delete('/:id')
   @ApiParam({ name: 'id', type: String })
   @ApiBearerAuth('access-token')
   async deleteDoctor(@Param('id') id: string): Promise<{ isActive: boolean }> {
