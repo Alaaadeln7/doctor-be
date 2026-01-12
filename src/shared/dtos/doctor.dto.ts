@@ -283,6 +283,17 @@ export class DoctorUpdateRawDataDto {
   @ValidateNested()
   @Type(() => ClincDto)
   clinic: ClincDto;
+
+  @ApiProperty({
+    name: 'categoryId',
+    description: 'Doctor category ID',
+    required: false,
+    example: 1,
+    type: Number,
+  })
+  @IsOptional()
+  @IsNumber()
+  categoryId: number;
 }
 
 export class doctorProfileResetPasswordDto {

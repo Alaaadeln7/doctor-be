@@ -162,7 +162,7 @@ export class DoctorService {
     data: DoctorUpdateRawDataDto,
     doctorId: number,
   ): Promise<DoctorResponseType> {
-    const { email, phone, fullName, address, clinic } = data;
+    const { email, phone, fullName, address, clinic, categoryId } = data;
 
     const doctor = await this.doctorProvider.findById(doctorId);
     if (!doctor) throw new NotFoundException('Doctor not found!');
@@ -190,6 +190,12 @@ export class DoctorService {
 
     if (clinic && JSON.stringify(clinic) !== JSON.stringify(doctor.clinic)) {
       updates.clinic = { ...clinic, imgs: existingImgs };
+    }
+
+    if (categoryId && categoryId !== doctor.category?.id) {
+      const category = await this.categoryService.findOneCategoryForDoctor(categoryId);
+      if (!category) throw new NotFoundException('Category not found!!');
+      updates.category = category;
     }
 
     if (Object.keys(updates).length === 0) {
