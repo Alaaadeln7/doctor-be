@@ -21,7 +21,6 @@ import {
 import {
   AddDoctorDto,
   ClincAndWorkingDaysDto,
-  doctorProfileChooseCategoryDto,
   doctorProfileResetPasswordDoDto,
   doctorProfileResetPasswordDto,
   DoctorProfileViewerDto,
@@ -164,14 +163,6 @@ export class DoctorController {
   @Post('/reset-password')
   async doctorResetPassword(@Body() data: doctorProfileResetPasswordDoDto) {
     return this.doctorService.doctorResetPassword(data);
-  }
-
-  @Put('/choose-category')
-  @ApiBearerAuth('access-token')
-  @HttpCode(200)
-  async chooseCategory(@Body() data: doctorProfileChooseCategoryDto, @Req() req: Request) {
-    const id = req['user'].id;
-    return this.doctorService.doctorProfileChooseCategory(data, +id);
   }
 
   @Patch('/update-password')

@@ -9,7 +9,6 @@ import {
 import {
   AddDoctorDto,
   ClincAndWorkingDaysDto,
-  doctorProfileChooseCategoryDto,
   doctorProfileResetPasswordDoDto,
   doctorProfileResetPasswordDto,
   DoctorProfileViewerDto,
@@ -58,7 +57,11 @@ export class DoctorService {
     const existingDoctor = await this.doctorProvider.findByEmailOrPhone(email, phone);
     if (existingDoctor) throw new ConflictException('Email or phone already in use');
 
+    const category = await this.categoryService.findOneCategoryForDoctor(data.categoryId);
+    if (!category) throw new NotFoundException('Category not found!!');
+
     const doctor = this.doctorProvider.create(data);
+    doctor.category = category;
 
     const credential = await this.credintialService.createDoctorCredits({
       password: await this.bcryptService.bcryptHashingUtil(data.password),
@@ -298,23 +301,6 @@ export class DoctorService {
       isActive: doctor.isActive,
       isVerified: doctor.isVerified,
     };
-  }
-
-  async doctorProfileChooseCategory(data: doctorProfileChooseCategoryDto, id: number) {
-    const category = await this.categoryService.findOneCategoryForDoctor(+data?.categoryId);
-    if (!category) throw new NotFoundException('Category not found!!');
-
-    const doctor = await this.doctorProvider.findById(id);
-    if (!doctor) throw new NotFoundException('Doctor account not found!!');
-
-    doctor.category = category;
-
-    try {
-      const savedDoctor = await this.doctorProvider.save(doctor);
-      return savedDoctor;
-    } catch (error) {
-      throw new ConflictException("Failed to update doctor's category.");
-    }
   }
 
   async doctorProfileUpdatePassword(data: updatePasswordDto, id: number): Promise<DoctorEntity> {

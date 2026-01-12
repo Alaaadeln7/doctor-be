@@ -14,7 +14,6 @@ import {
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 import { Binary } from 'typeorm';
-import { AddWoringHourDto } from './working-hours.dto';
 
 class FullNameDto {
   @ApiProperty({
@@ -172,6 +171,16 @@ export class AddDoctorDto {
   @IsNotEmpty()
   @IsString()
   syndicateNo: string;
+
+  @ApiProperty({
+    name: 'categoryId',
+    description: 'Doctor category ID',
+    required: true,
+    type: Number,
+  })
+  @IsNotEmpty()
+  @IsNumber()
+  categoryId: number;
 }
 
 export class DoctorFilesDto {
@@ -322,18 +331,6 @@ export class doctorProfileResetPasswordDoDto {
     message: 'password too weak',
   })
   password: string;
-}
-
-export class doctorProfileChooseCategoryDto {
-  @ApiProperty({
-    name: 'category id',
-    description: 'choosed category id go here',
-    type: 'number',
-    required: true,
-  })
-  @IsNumber()
-  @IsNotEmpty()
-  categoryId: number;
 }
 
 export class updatePasswordDto {
