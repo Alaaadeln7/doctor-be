@@ -42,7 +42,7 @@ interface RequestWithUser extends Request {
 export class CouponsController {
   constructor(private readonly couponsService: CouponsService) {}
 
-  @Post('/create')
+  @Post('/')
   @UseGuards(AuthGuard)
   @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Create a new coupon (Admin only)' })
