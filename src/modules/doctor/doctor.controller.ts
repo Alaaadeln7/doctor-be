@@ -15,6 +15,7 @@ import {
   Req,
   Res,
   UploadedFile,
+  UploadedFiles,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -47,7 +48,7 @@ import {
 import { JwtUtilService } from '../../common/utils/jwt.utils';
 import type { Request, Response } from 'express';
 import { DoctorEntity, FileClass } from '../../shared/entities/doctors.entity';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { Express } from 'express';
 @Controller('/doctor')
@@ -110,9 +111,15 @@ export class DoctorController {
 
   @Post('/clinic-and-working-hours')
   @ApiBearerAuth('access-token')
-  async addClincAndWorkingHours(@Body() data: ClincAndWorkingDaysDto, @Req() req: Request) {
+  @UseInterceptors(FilesInterceptor('imgs'))
+  @ApiConsumes('multipart/form-data')
+  async addClincAndWorkingHours(
+    @Body() data: ClincAndWorkingDaysDto,
+    @Req() req: Request,
+    @UploadedFiles() files: Array<Express.Multer.File>,
+  ) {
     const { id } = req['user'];
-    return this.doctorService.clincAndWorkingDays(data, id);
+    return this.doctorService.clincAndWorkingDays(data, id, files);
   }
 
   @Put('/update-my-profile')

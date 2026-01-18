@@ -18,7 +18,7 @@ import {
   LoginDoctorDto,
   updatePasswordDto,
 } from '../../shared/dtos/doctor.dto';
-import { DoctorEntity } from '../../shared/entities/doctors.entity';
+import { DoctorEntity, FileClass } from '../../shared/entities/doctors.entity';
 import { CredentialService } from '../credential/credential.service';
 import { PlanService } from '../plan/plan.service';
 import { CodeUtilService } from '../../common/utils/code.util';
@@ -33,7 +33,7 @@ import { BcryptUtilService } from '../../common/utils/bcrypt.util';
 import { CategoryService } from '../category/category.service';
 import { MailService } from '../../mail/mail.service';
 import { DoctorProvider } from './doctor.provider';
-import { StorageUtilService } from 'src/common/utils/storage.util';
+import { StorageUtilService } from '../../common/utils/storage.util';
 
 @Injectable()
 export class DoctorService {
@@ -359,13 +359,29 @@ export class DoctorService {
     return doctor;
   }
 
-  async clincAndWorkingDays(data: ClincAndWorkingDaysDto, doctorId: number) {
+  async clincAndWorkingDays(
+    data: ClincAndWorkingDaysDto,
+    doctorId: number,
+    files?: Array<Express.Multer.File>,
+  ) {
     const doctor = await this.doctorProvider.findById(doctorId);
     if (!doctor) throw new NotFoundException('Cannot found doctor account.');
+
+    let uploadedImgs: FileClass[] = [];
+    if (files && files.length > 0) {
+      const uploadResults = await this.StorageUtilService.uploadFiles(files, 'doctors/clinic');
+      uploadedImgs = uploadResults.map((res) => ({
+        public_id: res.public_id,
+        url: res.url,
+      }));
+    }
 
     const { clinic, workingHours } = data;
 
     await this.doctorProvider.executeTransaction(async (manager) => {
+      const existingImgs = doctor.clinic?.imgs || [];
+      const newImgs = [...existingImgs, ...uploadedImgs];
+
       doctor.clinic = {
         name: clinic.name || doctor.clinic.name,
         description: clinic.description || doctor.clinic.description,
@@ -375,7 +391,7 @@ export class DoctorService {
         landingPhone: clinic.landingPhone || doctor.clinic.landingPhone,
         price: clinic.price || doctor.clinic.price,
         rePrice: clinic.rePrice || doctor.clinic.rePrice,
-        imgs: doctor.clinic.imgs,
+        imgs: newImgs,
       };
 
       const savedDoctor = await manager.save(doctor);
