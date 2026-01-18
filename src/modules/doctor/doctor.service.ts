@@ -3,6 +3,7 @@
 import {
   BadRequestException,
   ConflictException,
+  HttpStatus,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -418,13 +419,9 @@ export class DoctorService {
     });
 
     return {
-      workingHours: {
-        days: workingHours.days,
-        time: {
-          from: workingHours.time.from,
-          to: workingHours.time.to,
-        },
-      },
+      message: 'Clinic and working hours updated successfully',
+      data: doctor.clinic,
+      statusCode: HttpStatus.OK,
     };
   }
 
