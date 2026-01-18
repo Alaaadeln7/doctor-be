@@ -421,7 +421,7 @@ export enum PaymentWay {
   BUCKET = 'bucket',
 }
 
-class ClincForWorkingHourDto {
+export class ClincForWorkingHourDto {
   @ApiProperty({
     description: 'Clinic name in multiple languages',
     example: 'Family Clinic',
@@ -519,7 +519,7 @@ class TimeDto {
   to: string;
 }
 
-class WorkingHoursInputDto {
+export class WorkingHoursInputDto {
   @ApiProperty({
     type: [String],
     example: ['monday', 'tuesday'],
@@ -554,6 +554,15 @@ export class ClincAndWorkingDaysDto {
   @ValidateNested()
   @Type(() => WorkingHoursInputDto)
   workingHours: WorkingHoursInputDto;
+
+  @ApiProperty({
+    type: 'array',
+    name: 'imgs',
+    items: { type: 'string', format: 'binary' },
+    required: false,
+  })
+  @IsOptional()
+  imgs: any[];
 }
 
 export enum orderKeyEnums {

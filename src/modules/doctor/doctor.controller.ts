@@ -22,6 +22,7 @@ import {
 import {
   AddDoctorDto,
   ClincAndWorkingDaysDto,
+  ClincForWorkingHourDto,
   doctorProfileResetPasswordDoDto,
   doctorProfileResetPasswordDto,
   DoctorProfileViewerDto,
@@ -31,6 +32,7 @@ import {
   LoginDoctorDto,
   orderKeyEnums,
   updatePasswordDto,
+  WorkingHoursInputDto,
 } from '../../shared/dtos/doctor.dto';
 import { DoctorService } from './doctor.service';
 import { Public } from '../../common/decorators/public.decorator';
@@ -44,6 +46,8 @@ import {
   ApiBody,
   ApiOperation,
   ApiResponse,
+  ApiExtraModels,
+  getSchemaPath,
 } from '@nestjs/swagger';
 import { JwtUtilService } from '../../common/utils/jwt.utils';
 import type { Request, Response } from 'express';
@@ -113,6 +117,27 @@ export class DoctorController {
   @ApiBearerAuth('access-token')
   @UseInterceptors(FilesInterceptor('imgs'))
   @ApiConsumes('multipart/form-data')
+  @ApiExtraModels(ClincForWorkingHourDto, WorkingHoursInputDto)
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        clinic: {
+          $ref: getSchemaPath(ClincForWorkingHourDto),
+        },
+        workingHours: {
+          $ref: getSchemaPath(WorkingHoursInputDto),
+        },
+        imgs: {
+          type: 'array',
+          items: {
+            type: 'string',
+            format: 'binary',
+          },
+        },
+      },
+    },
+  })
   async addClincAndWorkingHours(
     @Body() data: ClincAndWorkingDaysDto,
     @Req() req: Request,
