@@ -346,8 +346,8 @@ export class doctorProfileResetPasswordDoDto {
 
 export class updatePasswordDto {
   @ApiProperty({
-    name: 'old password',
-    description: 'old passwor dgo here',
+    name: 'oldPassword',
+    description: 'The current password of the doctor',
     type: 'string',
     required: true,
   })

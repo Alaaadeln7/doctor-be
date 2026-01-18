@@ -174,6 +174,15 @@ export class DoctorController {
 
   @Patch('/update-password')
   @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'Update doctor password' })
+  @ApiResponse({
+    status: 200,
+    description: 'Password updated successfully',
+    type: DoctorEntity,
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 404, description: 'Doctor not found' })
+  @ApiResponse({ status: 409, description: 'Old password incorrectly' })
   async doctorProfileUpdatePassword(@Body() data: updatePasswordDto, @Req() req: Request) {
     const { id } = req['user'];
     return this.doctorService.doctorProfileUpdatePassword(data, +id);
@@ -249,8 +258,19 @@ export class DoctorController {
   @UseGuards(AuthGuard)
   @Delete('/:id')
   @ApiParam({ name: 'id', type: String })
+  @ApiOperation({ summary: 'Delete doctor account' })
+  @ApiResponse({
+    status: 200,
+    description: 'Doctor deleted successfully',
+    schema: {
+      type: 'object',
+      properties: {
+        message: { type: 'string', example: 'Doctor deleted successfully' },
+      },
+    },
+  })
   @ApiBearerAuth('access-token')
-  async deleteDoctor(@Param('id') id: string): Promise<{ isActive: boolean }> {
+  async deleteDoctor(@Param('id') id: string): Promise<{ message: string }> {
     return this.doctorService.deleteDoctor(+id);
   }
 

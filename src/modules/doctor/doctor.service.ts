@@ -471,11 +471,12 @@ export class DoctorService {
     const doctor = await this.doctorProvider.findById(idNo);
     if (!doctor) throw new ConflictException('Doctor not found.');
 
-    doctor.isActive = !doctor.isActive;
+    doctor.isDeleted = true;
+    doctor.isActive = false;
     await this.doctorProvider.save(doctor);
 
     return {
-      isActive: Boolean(doctor.isActive),
+      message: 'Doctor deleted successfully',
     };
   }
 
