@@ -162,4 +162,8 @@ export class DoctorProvider {
       .limit(4)
       .getMany();
   }
+
+  async deleteDoctor(id: number) {
+    return await this.doctorRepo.delete(id);
+  }
 }

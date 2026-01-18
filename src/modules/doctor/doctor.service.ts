@@ -471,9 +471,7 @@ export class DoctorService {
     const doctor = await this.doctorProvider.findById(idNo);
     if (!doctor) throw new ConflictException('Doctor not found.');
 
-    doctor.isDeleted = true;
-    doctor.isActive = false;
-    await this.doctorProvider.save(doctor);
+    await this.doctorProvider.deleteDoctor(doctor.id);
 
     return {
       message: 'Doctor deleted successfully',
