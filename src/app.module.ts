@@ -6,7 +6,7 @@ import { DbModule } from './db/drs.db';
 import { PlanModule } from './modules/plan/plan.module';
 import { CategoryModule } from './modules/category/category.module';
 import { DoctorModule } from './modules/doctor/doctor.module';
-import { CredentialModule } from './modules/credential/credential.module';
+
 import { FileModule } from './modules/file/file.module';
 import { CommonModule } from './modules/common/common.module';
 import { LocationModule } from './modules/location/location.module';
@@ -29,7 +29,7 @@ import { CouponsModule } from './modules/coupons/coupons.module';
     PlanModule,
     CategoryModule,
     DoctorModule,
-    CredentialModule,
+
     FileModule,
     CommonModule,
     LocationModule,

@@ -20,7 +20,7 @@ import {
   updatePasswordDto,
 } from '../../shared/dtos/doctor.dto';
 import { DoctorEntity, FileClass } from '../../shared/entities/doctors.entity';
-import { CredentialService } from '../credential/credential.service';
+
 import { PlanService } from '../plan/plan.service';
 import { CodeUtilService } from '../../common/utils/code.util';
 import { OtpUtilService } from '../../common/utils/otp.util';
@@ -30,29 +30,29 @@ import { ConfigService } from '@nestjs/config';
 import type { Response } from 'express';
 import { Express } from 'express';
 import DoctorVerifyUpdateEmail from '../../common/pages/doctor.verifyUpdateEmail';
-import { BcryptUtilService } from '../../common/utils/bcrypt.util';
+
 import { CategoryService } from '../category/category.service';
 import { MailService } from '../../mail/mail.service';
 import { DoctorProvider } from './doctor.provider';
 import { StorageUtilService } from '../../common/utils/storage.util';
 
+import * as bcrypt from 'bcrypt';
+
 @Injectable()
 export class DoctorService {
   constructor(
     private readonly doctorProvider: DoctorProvider,
-    private readonly credintialService: CredentialService,
+    private readonly config: ConfigService,
     private readonly planService: PlanService,
     private readonly codeService: CodeUtilService,
     private readonly otpService: OtpUtilService,
     private readonly jwtService: JwtUtilService,
-    private readonly config: ConfigService,
-    private readonly bcryptService: BcryptUtilService,
     private readonly categoryService: CategoryService,
     private readonly mailService: MailService,
     private readonly StorageUtilService: StorageUtilService,
   ) {}
 
-  async doctorSignup(data: AddDoctorDto): Promise<DoctorResponseType & { token: string }> {
+  async signup(data: AddDoctorDto): Promise<DoctorResponseType & { token: string }> {
     const { email, phone } = data;
 
     const existingDoctor = await this.doctorProvider.findByEmailOrPhone(email, phone);
@@ -62,14 +62,9 @@ export class DoctorService {
     if (!category) throw new NotFoundException('Category not found!!');
 
     const doctor = this.doctorProvider.create(data);
+    const hashedPassword = await bcrypt.hash(data.password, 10);
+    doctor.password = hashedPassword;
     doctor.category = category;
-
-    const credential = await this.credintialService.createDoctorCredits({
-      password: await this.bcryptService.bcryptHashingUtil(data.password),
-      doctor,
-    });
-
-    if (!credential) throw new ConflictException('Failed to create doctor credits');
 
     const basicPlan = await this.planService.getTheBasicPlan();
     if (!basicPlan) throw new ConflictException('Basic plan not found');
@@ -79,8 +74,8 @@ export class DoctorService {
       fullName: doctor.fullName,
     });
     doctor.code = { code, count: 0 };
+    doctor.code = { code, count: 0 };
     doctor.plan = basicPlan;
-    doctor.credential = credential;
 
     let otp = this.otpService.generateComplexOtp(6);
     doctor.otp = otp;
@@ -115,7 +110,7 @@ export class DoctorService {
     };
   }
 
-  async doctorProfileVerifyAccountEmail(data: doctorProfleVerifeAccountEmailDto) {
+  async verifyAccountEmail(data: doctorProfleVerifeAccountEmailDto) {
     const { email, otp } = data;
     const doctor = await this.doctorProvider.findByEmail(email);
     if (!doctor) throw new NotFoundException('Doctor account not found!!');
@@ -135,34 +130,32 @@ export class DoctorService {
     }
   }
 
-  async doctorLogin(data: LoginDoctorDto): Promise<{
-    token: string;
-    doctor: {
-      name: { fname: string; lname: string };
-      email: string;
-      img: string | any;
-    };
-  }> {
+  async login(data: LoginDoctorDto) {
     const doctor = await this.doctorProvider.findByEmail(data.email);
     if (!doctor) throw new NotFoundException('Account not found!');
+
+    const isPasswordValid = await bcrypt.compare(data.password, doctor.password);
+
+    if (!isPasswordValid) throw new ConflictException('Invalid password!');
+
     if (!doctor.isActive) throw new ConflictException('Account is not active!');
     if (!doctor.isVerified) throw new ConflictException('Account is not verified!');
+
     const token = await this.jwtService.generateToken({
       email: data.email,
       id: doctor.id,
     });
+
     const doctorData = {
       name: doctor.fullName,
       email: doctor.email,
       img: doctor.img,
     };
+
     return { token, doctor: doctorData };
   }
 
-  async updateMyDoctorProfileRawData(
-    data: DoctorUpdateRawDataDto,
-    doctorId: number,
-  ): Promise<DoctorResponseType> {
+  async updateProfile(data: DoctorUpdateRawDataDto, doctorId: number): Promise<DoctorResponseType> {
     const { email, phone, fullName, address, clinic, categoryId } = data;
 
     const doctor = await this.doctorProvider.findById(doctorId);
@@ -264,7 +257,7 @@ export class DoctorService {
     };
   }
 
-  async doctorResetPasswordRequest(data: doctorProfileResetPasswordDto) {
+  async requestPasswordReset(data: doctorProfileResetPasswordDto) {
     const doctor = await this.doctorProvider.findByEmail(data.email);
     if (!doctor) throw new NotFoundException('Doctor not found');
     if (!doctor.isActive) throw new ConflictException('Doctor account is not active');
@@ -288,18 +281,16 @@ export class DoctorService {
     };
   }
 
-  async doctorResetPassword(data: doctorProfileResetPasswordDoDto) {
-    const doctor = await this.doctorProvider.findByEmailWithCredentials(data.email);
+  async resetPassword(data: doctorProfileResetPasswordDoDto) {
+    const doctor = await this.doctorProvider.findByEmail(data.email);
     if (!doctor) throw new NotFoundException('Doctor account not found!');
     if (!doctor.isActive) throw new ConflictException('Doctor account is not active');
     if (!doctor.isVerified) throw new ConflictException('Doctor account is not verified');
     if (data.otp !== doctor.otp) throw new ConflictException('Invalid OTP!');
-    if (!doctor.credential) throw new ConflictException('Doctor credentials not found!');
 
-    doctor.credential.password = await this.bcryptService.bcryptHashingUtil(data.password);
+    doctor.password = await bcrypt.hash(data.password, 10);
     doctor.otp = '';
 
-    await this.credintialService.saveDoctorCredential(doctor.credential);
     await this.doctorProvider.save(doctor);
 
     return {
@@ -310,18 +301,19 @@ export class DoctorService {
     };
   }
 
-  async doctorProfileUpdatePassword(data: updatePasswordDto, id: number): Promise<DoctorEntity> {
-    const doctor = await this.doctorProvider.findByIdWithCredentials(id);
+  async updatePassword(data: updatePasswordDto, id: number): Promise<DoctorEntity> {
+    const doctor = await this.doctorProvider.findById(id);
     if (!doctor) throw new NotFoundException('Doctor account not found!!');
 
     const { oldPassword, password } = data;
-    const isPassvalid = await this.bcryptService.bcryptCompareUtil(
-      oldPassword,
-      doctor.credential.password,
-    );
-    if (!isPassvalid) throw new ConflictException('Old password not match!!');
 
-    doctor.credential.password = await this.bcryptService.bcryptHashingUtil(password);
+    const isPassValid = await bcrypt.compare(oldPassword, doctor.password);
+
+    if (!isPassValid) throw new ConflictException('Old password not match!!');
+
+    const hashedNewPassword = await bcrypt.hash(password, 10);
+    doctor.password = hashedNewPassword;
+
     try {
       const savedDoctor = await this.doctorProvider.save(doctor);
       return savedDoctor;
@@ -330,7 +322,7 @@ export class DoctorService {
     }
   }
 
-  async doctorProfileView(viewedDoctorId: number, data: DoctorProfileViewerDto) {
+  async viewProfile(viewedDoctorId: number, data: DoctorProfileViewerDto) {
     const doctor = await this.doctorProvider.findById(viewedDoctorId);
     if (!doctor) throw new ConflictException('Account not found!!');
 
@@ -360,7 +352,7 @@ export class DoctorService {
     return doctor;
   }
 
-  async clincAndWorkingDays(
+  async updateClinicAndWorkingHours(
     data: ClincAndWorkingDaysDto,
     doctorId: number,
     files?: Array<Express.Multer.File>,
@@ -425,11 +417,11 @@ export class DoctorService {
     };
   }
 
-  async getAllDoctors(queryObj: GetDoctorQueriesDto) {
+  async findAll(queryObj: GetDoctorQueriesDto) {
     return await this.doctorProvider.getAllDoctors(queryObj);
   }
 
-  async handleBlockDoctor(idNo: number) {
+  async toggleBlockStatus(idNo: number) {
     if (!idNo) throw new BadRequestException('Doctor id not found.');
 
     const doctor = await this.doctorProvider.findById(idNo);
@@ -462,7 +454,7 @@ export class DoctorService {
     return { success: true, url: uploadResult.url, doctorId };
   }
 
-  public async deleteDoctor(idNo: number) {
+  async remove(idNo: number) {
     if (!idNo) throw new BadRequestException('Doctor id not found.');
 
     const doctor = await this.doctorProvider.findById(idNo);
@@ -475,7 +467,7 @@ export class DoctorService {
     };
   }
 
-  public async getDoctorFiltrationInfo() {
+  public async getFiltrationInfo() {
     return this.doctorProvider.getDoctorFiltrationInfo();
   }
 

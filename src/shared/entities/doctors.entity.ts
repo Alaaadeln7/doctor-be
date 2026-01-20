@@ -3,7 +3,6 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  JoinColumn,
   ManyToOne,
   OneToMany,
   OneToOne,
@@ -14,7 +13,7 @@ import { PlanEntity } from './plans.entity';
 import { RequestEntity } from './requests.entity';
 import { WorkingHoursEntity } from './workinHours.entity';
 import { AppointmentEntity } from './appointments.entity';
-import { CredentialEntity } from './credentials.entity';
+
 import { CategoryEntity } from './categoris.entity';
 import { Coupon } from '../../modules/coupons/entities/coupon.entity';
 
@@ -35,6 +34,9 @@ export class DoctorEntity {
 
   @Column({ type: 'varchar', nullable: false, unique: true })
   phone: string;
+
+  @Column({ type: 'varchar', nullable: false, default: '' })
+  password: string;
 
   @Column({ type: 'boolean', default: false })
   isDeleted: boolean;
@@ -152,10 +154,4 @@ export class DoctorEntity {
 
   @OneToMany(() => AppointmentEntity, (appointment) => appointment.doctor)
   appointments: AppointmentEntity[];
-
-  @OneToOne(() => CredentialEntity, (credential) => credential.doctor, {
-    cascade: true,
-  })
-  @JoinColumn()
-  credential: CredentialEntity;
 }

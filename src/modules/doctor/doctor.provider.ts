@@ -32,7 +32,6 @@ export class DoctorProvider {
   async findByEmailWithCredentials(email: string): Promise<DoctorEntity | null> {
     return await this.doctorRepo.findOne({
       where: { email },
-      relations: ['credential'],
     });
   }
 
@@ -43,7 +42,6 @@ export class DoctorProvider {
   async findByIdWithCredentials(id: number): Promise<DoctorEntity | null> {
     return await this.doctorRepo.findOne({
       where: { id },
-      relations: ['credential'],
     });
   }
 

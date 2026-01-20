@@ -63,6 +63,7 @@ export class DoctorController {
   ) {}
 
   @Post('upload-payment-image')
+  @ApiOperation({ summary: 'Upload payment image for doctor' })
   @ApiBearerAuth('access-token')
   @UseGuards(AuthGuard)
   @UseInterceptors(FileInterceptor('paymentImage'))
@@ -89,20 +90,25 @@ export class DoctorController {
 
   @Post('/signup')
   @Public()
-  async doctorSignup(@Body() data: AddDoctorDto): Promise<DoctorResponseType & { token: string }> {
-    return this.doctorService.doctorSignup(data);
+  @ApiOperation({ summary: 'Doctor signup' })
+  @ApiResponse({ status: 201, description: 'Doctor created successfully' })
+  async signup(@Body() data: AddDoctorDto): Promise<DoctorResponseType & { token: string }> {
+    return this.doctorService.signup(data);
   }
 
   @Post('/verify-signup')
   @Public()
-  async doctorProfileVerifyAccountEmail(@Body() data: doctorProfleVerifeAccountEmailDto) {
-    return this.doctorService.doctorProfileVerifyAccountEmail(data);
+  @ApiOperation({ summary: 'Verify doctor signup with OTP' })
+  async verifyEmail(@Body() data: doctorProfleVerifeAccountEmailDto) {
+    return this.doctorService.verifyAccountEmail(data);
   }
 
   @Post('/login')
   @Public()
   @HttpCode(200)
-  async doctorLogin(@Body() data: LoginDoctorDto): Promise<{
+  @ApiOperation({ summary: 'Doctor login' })
+  @ApiResponse({ status: 200, description: 'Login successful' })
+  async login(@Body() data: LoginDoctorDto): Promise<{
     token: string;
     doctor: {
       name: { fname: string; lname: string };
@@ -110,11 +116,12 @@ export class DoctorController {
       img: string | FileClass;
     };
   }> {
-    return this.doctorService.doctorLogin(data);
+    return this.doctorService.login(data);
   }
 
   @Post('/clinic-and-working-hours')
   @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'Update clinic and working hours' })
   @UseInterceptors(FilesInterceptor('imgs'))
   @ApiConsumes('multipart/form-data')
   @ApiExtraModels(ClincForWorkingHourDto, WorkingHoursInputDto)
@@ -138,27 +145,29 @@ export class DoctorController {
       },
     },
   })
-  async addClincAndWorkingHours(
+  async updateClinicAndWorkingHours(
     @Body() data: ClincAndWorkingDaysDto,
     @Req() req: Request,
     @UploadedFiles() files: Array<Express.Multer.File>,
   ) {
     const { id } = req['user'];
-    return this.doctorService.clincAndWorkingDays(data, id, files);
+    return this.doctorService.updateClinicAndWorkingHours(data, id, files);
   }
 
   @Put('/update-my-profile')
   @ApiBearerAuth('access-token')
-  async updateMyDoctorProfileRawData(
+  @ApiOperation({ summary: 'Update doctor profile raw data' })
+  async updateProfile(
     @Body() data: DoctorUpdateRawDataDto,
     @Req() req: Request,
   ): Promise<DoctorResponseType> {
     const { id } = req['user'];
-    return this.doctorService.updateMyDoctorProfileRawData(data, id);
+    return this.doctorService.updateProfile(data, id);
   }
 
   @Get('/verify-update-email')
   @Public()
+  @ApiOperation({ summary: 'Verify updated email via token' })
   async verifyUpdatedEmail(@Res() res: Response, @Query('token') token: string) {
     const decoded = this.jwtService.verifyToken(token);
     if (!decoded || !decoded.email || !decoded.id) {
@@ -170,6 +179,7 @@ export class DoctorController {
   @Public()
   @Post('/verify-doctor-email-after-update-otp')
   @ApiExcludeEndpoint()
+  @ApiOperation({ summary: 'Verify doctor email after update with OTP' })
   async verifyDoctorEmailAfterUpdateOtp(
     @Body('otp') otp: string,
     @Query('token') token: string,
@@ -187,14 +197,16 @@ export class DoctorController {
 
   @Public()
   @Post('/reset-password-request')
-  async doctorResetPasswordRequest(@Body() data: doctorProfileResetPasswordDto) {
-    return this.doctorService.doctorResetPasswordRequest(data);
+  @ApiOperation({ summary: 'Request password reset' })
+  async requestPasswordReset(@Body() data: doctorProfileResetPasswordDto) {
+    return this.doctorService.requestPasswordReset(data);
   }
 
   @Public()
   @Post('/reset-password')
-  async doctorResetPassword(@Body() data: doctorProfileResetPasswordDoDto) {
-    return this.doctorService.doctorResetPassword(data);
+  @ApiOperation({ summary: 'Reset password' })
+  async resetPassword(@Body() data: doctorProfileResetPasswordDoDto) {
+    return this.doctorService.resetPassword(data);
   }
 
   @Patch('/update-password')
@@ -208,14 +220,15 @@ export class DoctorController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 404, description: 'Doctor not found' })
   @ApiResponse({ status: 409, description: 'Old password incorrectly' })
-  async doctorProfileUpdatePassword(@Body() data: updatePasswordDto, @Req() req: Request) {
+  async updatePassword(@Body() data: updatePasswordDto, @Req() req: Request) {
     const { id } = req['user'];
-    return this.doctorService.doctorProfileUpdatePassword(data, +id);
+    return this.doctorService.updatePassword(data, +id);
   }
 
   @Patch('/:id/view')
   @Public()
   @HttpCode(204)
+  @ApiOperation({ summary: 'Record profile view' })
   @ApiParam({
     name: 'id',
     description: 'profile id',
@@ -223,18 +236,20 @@ export class DoctorController {
     example: 1,
     type: 'number',
   })
-  async doctorProfileView(@Param('id') id: string, @Body() data: DoctorProfileViewerDto) {
-    return this.doctorService.doctorProfileView(+id, data);
+  async viewProfile(@Param('id') id: string, @Body() data: DoctorProfileViewerDto) {
+    return this.doctorService.viewProfile(+id, data);
   }
 
   @Get('/my-data')
   @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'Get current doctor data' })
   async getMyData(@Req() req: Request): Promise<DoctorEntity> {
     const { id } = req['user'];
     return this.doctorService.getMyData(id);
   }
 
   @Get()
+  @ApiOperation({ summary: 'Get all doctors with filtration' })
   @ApiQuery({
     name: 'page',
     description: 'pagination',
@@ -270,14 +285,15 @@ export class DoctorController {
     if (governorate) directDoctorFilters.governorate = governorate;
     if (center) directDoctorFilters.center = center;
 
-    return this.doctorService.getAllDoctors(directDoctorFilters);
+    return this.doctorService.findAll(directDoctorFilters);
   }
 
   @Patch('/handle-block/:id')
+  @ApiOperation({ summary: 'Toggle doctor block status' })
   @ApiParam({ name: 'id', type: String })
   @ApiBearerAuth('access-token')
-  async handleBlockDoctor(@Param('id') id: string): Promise<{ isActive: boolean }> {
-    return this.doctorService.handleBlockDoctor(+id);
+  async toggleBlockStatus(@Param('id') id: string): Promise<{ isActive: boolean }> {
+    return this.doctorService.toggleBlockStatus(+id);
   }
 
   @UseGuards(AuthGuard)
@@ -295,8 +311,8 @@ export class DoctorController {
     },
   })
   @ApiBearerAuth('access-token')
-  async deleteDoctor(@Param('id') id: string): Promise<{ message: string }> {
-    return this.doctorService.deleteDoctor(+id);
+  async remove(@Param('id') id: string): Promise<{ message: string }> {
+    return this.doctorService.remove(+id);
   }
 
   @Get('/best')
@@ -357,6 +373,6 @@ export class DoctorController {
     },
   })
   async getDoctorFiltrationInfo() {
-    return this.doctorService.getDoctorFiltrationInfo();
+    return this.doctorService.getFiltrationInfo();
   }
 }

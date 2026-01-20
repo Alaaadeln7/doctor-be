@@ -4,7 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AdminEntity } from '../shared/entities/admins.entity';
 import { AppointmentEntity } from '../shared/entities/appointments.entity';
 import { CategoryEntity } from '../shared/entities/categoris.entity';
-import { CredentialEntity } from '../shared/entities/credentials.entity';
+
 import { DoctorEntity } from '../shared/entities/doctors.entity';
 import { PlanEntity } from '../shared/entities/plans.entity';
 import { RateEntity } from '../shared/entities/rates.entity';
@@ -41,7 +41,7 @@ import { ContactUs } from '../modules/contact-us/entities/contact-us.entity';
             RequestEntity,
             ReservationEntity,
             WorkingHoursEntity,
-            CredentialEntity,
+
             GovernorateEntity,
             CityEntity,
             Subscription,
