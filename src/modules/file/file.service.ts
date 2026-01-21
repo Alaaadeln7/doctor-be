@@ -1,5 +1,3 @@
-/* eslint-disable */
-
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { StorageUtilService } from '../..//common/utils/storage.util';

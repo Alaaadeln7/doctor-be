@@ -27,7 +27,7 @@ import { OtpUtilService } from '../../common/utils/otp.util';
 import { DoctorResponseType } from '../../shared/type/doctor.type';
 import { JwtUtilService } from '../../common/utils/jwt.utils';
 import { ConfigService } from '@nestjs/config';
-import type { Response } from 'express';
+
 import { Express } from 'express';
 import DoctorVerifyUpdateEmail from '../../common/pages/doctor.verifyUpdateEmail';
 
@@ -37,6 +37,7 @@ import { DoctorProvider } from './doctor.provider';
 import { StorageUtilService } from '../../common/utils/storage.util';
 
 import * as bcrypt from 'bcrypt';
+import responsePattern from '../../utils/response.pattern';
 
 @Injectable()
 export class DoctorService {
@@ -52,7 +53,7 @@ export class DoctorService {
     private readonly StorageUtilService: StorageUtilService,
   ) {}
 
-  async signup(data: AddDoctorDto): Promise<DoctorResponseType & { token: string }> {
+  async signup(data: AddDoctorDto) {
     const { email, phone } = data;
 
     const existingDoctor = await this.doctorProvider.findByEmailOrPhone(email, phone);
@@ -102,12 +103,16 @@ export class DoctorService {
       email: savedDoctor.email,
     });
 
-    return {
-      fullName: savedDoctor.fullName.fname + ' ' + savedDoctor.fullName.lname,
-      isActive: savedDoctor.isActive,
-      isVerified: savedDoctor.isVerified,
-      token,
-    };
+    return responsePattern({
+      statusCode: HttpStatus.CREATED,
+      message: 'Doctor created successfully',
+      data: {
+        fullName: savedDoctor.fullName.fname + ' ' + savedDoctor.fullName.lname,
+        isActive: savedDoctor.isActive,
+        isVerified: savedDoctor.isVerified,
+        token,
+      },
+    });
   }
 
   async verifyAccountEmail(data: doctorProfleVerifeAccountEmailDto) {
@@ -120,11 +125,15 @@ export class DoctorService {
     doctor.otp = '';
     try {
       await this.doctorProvider.save(doctor);
-      return {
-        fullName: doctor.fullName.fname + ' ' + doctor.fullName.lname,
-        isActive: doctor.isActive,
-        isVerified: doctor.isVerified,
-      };
+      return responsePattern({
+        statusCode: HttpStatus.OK,
+        message: 'Account verified successfully',
+        data: {
+          fullName: doctor.fullName.fname + ' ' + doctor.fullName.lname,
+          isActive: doctor.isActive,
+          isVerified: doctor.isVerified,
+        },
+      });
     } catch (error) {
       throw new ConflictException('Somthing went wrong on valid your account');
     }
@@ -152,10 +161,14 @@ export class DoctorService {
       img: doctor.img,
     };
 
-    return { token, doctor: doctorData };
+    return responsePattern({
+      statusCode: HttpStatus.OK,
+      message: 'Login successful',
+      data: { token, doctor: doctorData },
+    });
   }
 
-  async updateProfile(data: DoctorUpdateRawDataDto, doctorId: number): Promise<DoctorResponseType> {
+  async updateProfile(data: DoctorUpdateRawDataDto, doctorId: number) {
     const { email, phone, fullName, address, clinic, categoryId } = data;
 
     const doctor = await this.doctorProvider.findById(doctorId);
@@ -193,11 +206,15 @@ export class DoctorService {
     }
 
     if (Object.keys(updates).length === 0) {
-      return {
-        fullName: `${doctor.fullName.fname} ${doctor.fullName.lname}`,
-        isActive: doctor.isActive,
-        isVerified: doctor.isVerified,
-      };
+      return responsePattern({
+        statusCode: HttpStatus.OK,
+        message: 'No changes detected',
+        data: {
+          fullName: `${doctor.fullName.fname} ${doctor.fullName.lname}`,
+          isActive: doctor.isActive,
+          isVerified: doctor.isVerified,
+        },
+      });
     }
 
     Object.assign(doctor, updates);
@@ -220,26 +237,26 @@ export class DoctorService {
       console.error('Error sending doctor update email:', error);
     }
 
-    return {
-      fullName: `${updatedDoctor.fullName.fname} ${updatedDoctor.fullName.lname}`,
-      isActive: updatedDoctor.isActive,
-      isVerified: updatedDoctor.isVerified,
-    };
+    return responsePattern({
+      statusCode: HttpStatus.OK,
+      message: 'Profile updated successfully',
+      data: {
+        fullName: `${updatedDoctor.fullName.fname} ${updatedDoctor.fullName.lname}`,
+        isActive: updatedDoctor.isActive,
+        isVerified: updatedDoctor.isVerified,
+      },
+    });
   }
 
-  async verifyUpdatedEmail(data: { email: string; id: number }, res: Response) {
+  async verifyUpdatedEmail(data: { email: string; id: number }) {
     const doctor = await this.doctorProvider.findByEmail(data.email);
     if (!doctor) {
-      return res.status(404).send('Doctor not found');
+      throw new NotFoundException('Doctor not found');
     }
-    res.send(DoctorVerifyUpdateEmail(doctor.fullName.fname + ' ' + doctor.fullName.lname));
+    return DoctorVerifyUpdateEmail(doctor.fullName.fname + ' ' + doctor.fullName.lname);
   }
 
-  async verifyDoctorEmailAfterUpdateOtp(data: {
-    otp: string;
-    email: string;
-    id: number;
-  }): Promise<DoctorResponseType> {
+  async verifyDoctorEmailAfterUpdateOtp(data: { otp: string; email: string; id: number }) {
     const doctor = await this.doctorProvider.findByEmail(data.email);
     if (!doctor || doctor.id !== data.id) throw new NotFoundException('Doctor not found');
     if (doctor.otp !== data.otp) throw new ConflictException('Invalid OTP');
@@ -250,11 +267,15 @@ export class DoctorService {
     if (!updatedDoctor) {
       throw new ConflictException('Failed to update doctor email verification status');
     }
-    return {
-      fullName: `${updatedDoctor.fullName.fname} ${updatedDoctor.fullName.lname}`,
-      isActive: updatedDoctor.isActive,
-      isVerified: updatedDoctor.isVerified,
-    };
+    return responsePattern({
+      statusCode: HttpStatus.OK,
+      message: 'Email verified successfully',
+      data: {
+        fullName: `${updatedDoctor.fullName.fname} ${updatedDoctor.fullName.lname}`,
+        isActive: updatedDoctor.isActive,
+        isVerified: updatedDoctor.isVerified,
+      },
+    });
   }
 
   async requestPasswordReset(data: doctorProfileResetPasswordDto) {
@@ -274,11 +295,15 @@ export class DoctorService {
       updatedDoctor.otp,
       `${this.config.get<string>('envConfig.be.updateMyEmailRedirectionLink') + '/verify_update_email' + `?token=${this.jwtService.generateToken({ email: updatedDoctor.email, id: updatedDoctor.id })}`}`,
     );
-    return {
-      fullName: `${updatedDoctor.fullName.fname} ${updatedDoctor.fullName.lname}`,
-      isActive: updatedDoctor.isActive,
-      isVerified: updatedDoctor.isVerified,
-    };
+    return responsePattern({
+      statusCode: HttpStatus.OK,
+      message: 'Password reset requested successfully',
+      data: {
+        fullName: `${updatedDoctor.fullName.fname} ${updatedDoctor.fullName.lname}`,
+        isActive: updatedDoctor.isActive,
+        isVerified: updatedDoctor.isVerified,
+      },
+    });
   }
 
   async resetPassword(data: doctorProfileResetPasswordDoDto) {
@@ -293,15 +318,18 @@ export class DoctorService {
 
     await this.doctorProvider.save(doctor);
 
-    return {
+    return responsePattern({
+      statusCode: HttpStatus.OK,
       message: 'Password reset successfully',
-      fullName: `${doctor.fullName.fname} ${doctor.fullName.lname}`,
-      isActive: doctor.isActive,
-      isVerified: doctor.isVerified,
-    };
+      data: {
+        fullName: `${doctor.fullName.fname} ${doctor.fullName.lname}`,
+        isActive: doctor.isActive,
+        isVerified: doctor.isVerified,
+      },
+    });
   }
 
-  async updatePassword(data: updatePasswordDto, id: number): Promise<DoctorEntity> {
+  async updatePassword(data: updatePasswordDto, id: number) {
     const doctor = await this.doctorProvider.findById(id);
     if (!doctor) throw new NotFoundException('Doctor account not found!!');
 
@@ -316,7 +344,11 @@ export class DoctorService {
 
     try {
       const savedDoctor = await this.doctorProvider.save(doctor);
-      return savedDoctor;
+      return responsePattern({
+        statusCode: HttpStatus.OK,
+        message: 'Password updated successfully',
+        data: savedDoctor,
+      });
     } catch (error) {
       throw new ConflictException("Failed to update doctor's password");
     }
@@ -410,11 +442,11 @@ export class DoctorService {
       }
     });
 
-    return {
+    return responsePattern({
+      statusCode: HttpStatus.OK,
       message: 'Clinic and working hours updated successfully',
       data: doctor.clinic,
-      statusCode: HttpStatus.OK,
-    };
+    });
   }
 
   async findAll(queryObj: GetDoctorQueriesDto) {
@@ -430,9 +462,13 @@ export class DoctorService {
     doctor.isActive = !doctor.isActive;
     await this.doctorProvider.save(doctor);
 
-    return {
-      isActive: Boolean(doctor.isActive),
-    };
+    return responsePattern({
+      statusCode: HttpStatus.OK,
+      message: 'Block status toggled successfully',
+      data: {
+        isActive: Boolean(doctor.isActive),
+      },
+    });
   }
 
   public async uploadPaymentImage(file: Express.Multer.File, doctorId: number) {
@@ -451,7 +487,11 @@ export class DoctorService {
     doctor.paymentImage = uploadResult.url;
     await this.doctorProvider.save(doctor);
 
-    return { success: true, url: uploadResult.url, doctorId };
+    return responsePattern({
+      statusCode: HttpStatus.OK,
+      message: 'Payment image uploaded successfully',
+      data: { success: true, url: uploadResult.url, doctorId },
+    });
   }
 
   async remove(idNo: number) {
@@ -462,9 +502,11 @@ export class DoctorService {
 
     await this.doctorProvider.deleteDoctor(doctor.id);
 
-    return {
+    return responsePattern({
+      statusCode: HttpStatus.OK,
       message: 'Doctor deleted successfully',
-    };
+      data: null,
+    });
   }
 
   public async getFiltrationInfo() {

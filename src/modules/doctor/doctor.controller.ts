@@ -13,7 +13,6 @@ import {
   Put,
   Query,
   Req,
-  Res,
   UploadedFile,
   UploadedFiles,
   UseGuards,
@@ -50,7 +49,7 @@ import {
   getSchemaPath,
 } from '@nestjs/swagger';
 import { JwtUtilService } from '../../common/utils/jwt.utils';
-import type { Request, Response } from 'express';
+import type { Request } from 'express';
 import { DoctorEntity, FileClass } from '../../shared/entities/doctors.entity';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { AuthGuard } from 'src/guards/auth.guard';
@@ -92,7 +91,7 @@ export class DoctorController {
   @Public()
   @ApiOperation({ summary: 'Doctor signup' })
   @ApiResponse({ status: 201, description: 'Doctor created successfully' })
-  async signup(@Body() data: AddDoctorDto): Promise<DoctorResponseType & { token: string }> {
+  async signup(@Body() data: AddDoctorDto) {
     return this.doctorService.signup(data);
   }
 
@@ -108,14 +107,7 @@ export class DoctorController {
   @HttpCode(200)
   @ApiOperation({ summary: 'Doctor login' })
   @ApiResponse({ status: 200, description: 'Login successful' })
-  async login(@Body() data: LoginDoctorDto): Promise<{
-    token: string;
-    doctor: {
-      name: { fname: string; lname: string };
-      email: string;
-      img: string | FileClass;
-    };
-  }> {
+  async login(@Body() data: LoginDoctorDto) {
     return this.doctorService.login(data);
   }
 
@@ -157,10 +149,7 @@ export class DoctorController {
   @Put('/update-my-profile')
   @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Update doctor profile raw data' })
-  async updateProfile(
-    @Body() data: DoctorUpdateRawDataDto,
-    @Req() req: Request,
-  ): Promise<DoctorResponseType> {
+  async updateProfile(@Body() data: DoctorUpdateRawDataDto, @Req() req: Request) {
     const { id } = req['user'];
     return this.doctorService.updateProfile(data, id);
   }
@@ -168,22 +157,19 @@ export class DoctorController {
   @Get('/verify-update-email')
   @Public()
   @ApiOperation({ summary: 'Verify updated email via token' })
-  async verifyUpdatedEmail(@Res() res: Response, @Query('token') token: string) {
+  async verifyUpdatedEmail(@Query('token') token: string) {
     const decoded = this.jwtService.verifyToken(token);
     if (!decoded || !decoded.email || !decoded.id) {
-      return res.status(400).send('Invalid credentials!!!');
+      throw new BadRequestException('Invalid credentials!!!');
     }
-    return this.doctorService.verifyUpdatedEmail({ email: decoded.email, id: +decoded.id }, res);
+    return this.doctorService.verifyUpdatedEmail({ email: decoded.email, id: +decoded.id });
   }
 
   @Public()
   @Post('/verify-doctor-email-after-update-otp')
   @ApiExcludeEndpoint()
   @ApiOperation({ summary: 'Verify doctor email after update with OTP' })
-  async verifyDoctorEmailAfterUpdateOtp(
-    @Body('otp') otp: string,
-    @Query('token') token: string,
-  ): Promise<DoctorResponseType> {
+  async verifyDoctorEmailAfterUpdateOtp(@Body('otp') otp: string, @Query('token') token: string) {
     const decoded = this.jwtService.verifyToken(token);
     if (!decoded || !decoded.email || !decoded.id) {
       throw new BadRequestException('Invalid credentials!!!');
@@ -292,7 +278,7 @@ export class DoctorController {
   @ApiOperation({ summary: 'Toggle doctor block status' })
   @ApiParam({ name: 'id', type: String })
   @ApiBearerAuth('access-token')
-  async toggleBlockStatus(@Param('id') id: string): Promise<{ isActive: boolean }> {
+  async toggleBlockStatus(@Param('id') id: string) {
     return this.doctorService.toggleBlockStatus(+id);
   }
 
@@ -311,7 +297,7 @@ export class DoctorController {
     },
   })
   @ApiBearerAuth('access-token')
-  async remove(@Param('id') id: string): Promise<{ message: string }> {
+  async remove(@Param('id') id: string) {
     return this.doctorService.remove(+id);
   }
 
