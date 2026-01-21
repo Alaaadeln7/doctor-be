@@ -421,6 +421,18 @@ export enum PaymentWay {
   BUCKET = 'bucket',
 }
 
+class TimeDto {
+  @ApiProperty({ example: '09:00' })
+  @IsString()
+  @IsNotEmpty()
+  from: string;
+
+  @ApiProperty({ example: '17:00' })
+  @IsString()
+  @IsNotEmpty()
+  to: string;
+}
+
 export class ClincForWorkingHourDto {
   @ApiProperty({
     description: 'Clinic name in multiple languages',
@@ -485,6 +497,8 @@ export class ClincForWorkingHourDto {
     required: true,
   })
   @IsNumber()
+  @Min(0)
+  @Type(() => Number)
   @IsNotEmpty()
   price: number;
 
@@ -495,6 +509,8 @@ export class ClincForWorkingHourDto {
     required: true,
   })
   @IsNumber()
+  @Min(0)
+  @Type(() => Number)
   @IsNotEmpty()
   rePrice: number;
 
@@ -505,18 +521,6 @@ export class ClincForWorkingHourDto {
   })
   @IsEnum(PaymentWay)
   paymentWay: PaymentWay;
-}
-
-class TimeDto {
-  @ApiProperty({ example: '09:00' })
-  @IsString()
-  @IsNotEmpty()
-  from: string;
-
-  @ApiProperty({ example: '17:00' })
-  @IsString()
-  @IsNotEmpty()
-  to: string;
 }
 
 export class WorkingHoursInputDto {
